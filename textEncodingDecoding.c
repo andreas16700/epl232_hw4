@@ -5,9 +5,47 @@
 #include <string.h>
 #include <stdlib.h>
 
+PRIVATE char *readText(FILE *textToHide);
+
+PRIVATE int getBit(char *m, int n);
+
+newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide);
+
+char **decodeTextFromImage(FILE *imageWithHiddenText);
+
+PRIVATE int *createPermutationFunction(int N, unsigned int systemkey);
+
 newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide) {
+    int systemkey = 1;
+    char *text = readText(textToHide);
 
 }
+
+PRIVATE char *readText(FILE *textToHide) {
+    if (textToHide == NULL) {
+        printf("File of text to hide not found!\n");
+        return 0;
+    }
+    char c;
+    //creating array chars
+    char *text = (char *) malloc(sizeof(char) * 10);
+    int cntChar = 0;
+    while ((c = fgetc(textToHide)) != EOF) {
+        if (cntChar + 1 >= sizeof(text)) {
+            char *temp = (char *) realloc(text, (sizeof(char) * (cntChar * 2)));
+            if (temp == NULL) {
+                printf("Cant allocate!\n");
+                return 0;
+            }
+            text = temp;
+        }
+        text[cntChar] = c;
+        cntChar++;
+    }
+    text[cntChar] = '\0';
+    return text;
+}
+
 
 char **decodeTextFromImage(FILE *imageWithHiddenText) {
 
@@ -32,7 +70,7 @@ PRIVATE int *createPermutationFunction(int N, unsigned int systemkey) {
     for (int i = 0; i < N; i++) {
         perm[i] = i;
     }
-    //randomly chanmges order
+    //randomly changes order
     for (int i = 0; i < N; i++) {
         int val1 = rand() % N;
         int val2 = rand() % N;
