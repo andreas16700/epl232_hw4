@@ -5,18 +5,12 @@
 #include <stdio.h>
 
 typedef struct IMAGERETURNTYPE* newImage;
-typedef struct BMPFILEHEADER* bmpFileHeaderType;
-typedef struct BMPINFOHEADER* bmpInfoHeaderType;
-typedef struct BMPMETA {
-    bmpFileHeaderType fileHeader;
-    bmpInfoHeaderType infoHeader;
-}* bmpMeta;
 /**
  * Prints the meta info of the header file of a bitmap image
  * @param bmpImage
  * the image file
  */
-bmpMeta getMetaInfo(FILE* bmpImage);
+void getMetaInfo(FILE* bmpImage);
 /**
  * Applies the grayscale filter to a bitmap image to a new image file
  * @param ofImage
