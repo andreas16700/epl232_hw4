@@ -2,15 +2,22 @@
 #define BMPLIB_BMPLIB_H
 #define PUBLIC
 #define PRIVATE static
-#include <stdio.h>
 
-typedef struct IMAGERETURNTYPE* newImage;
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct IMAGERETURNTYPE *newImage;
+
+typedef unsigned char byte;
+typedef unsigned short int word;
+typedef unsigned int dword;
+
 /**
  * Prints the meta info of the header file of a bitmap image
  * @param bmpImage
  * the image file
  */
-void getMetaInfo(FILE* bmpImage);
+void getMetaInfo(FILE *bmpImage);
+
 /**
  * Applies the grayscale filter to a bitmap image to a new image file
  * @param ofImage
@@ -18,7 +25,8 @@ void getMetaInfo(FILE* bmpImage);
  * @return
  * (new) image with the filter applied
  */
-newImage applyGrayscale(FILE* ofImage);
+newImage applyGrayscale(FILE *ofImage);
+
 /**
  * Hides an image inside another image.
  * @param shellImage
@@ -33,7 +41,8 @@ newImage applyGrayscale(FILE* ofImage);
  * @return
  * the resulting image
  */
-newImage encodeImageWithinImage(FILE* shellImage, FILE* hiddenImage, int bitsToUse);
+newImage encodeImageWithinImage(FILE *shellImage, FILE *hiddenImage, int bitsToUse);
+
 /**
  * Recovers an image that was steganographically hidden inside another image.
  * Has the opposite effect of encodeImageWithinImage().
@@ -44,7 +53,8 @@ newImage encodeImageWithinImage(FILE* shellImage, FILE* hiddenImage, int bitsToU
  * @return
  * resulting new image
  */
-newImage decodeHiddenImageFromEncodedImage(FILE* encryptedImage, int bitsToUse);
+newImage decodeHiddenImageFromEncodedImage(FILE *encryptedImage, int bitsToUse);
+
 /**
  * Hide some text inside an image
  * @param sourceImage
@@ -54,7 +64,8 @@ newImage decodeHiddenImageFromEncodedImage(FILE* encryptedImage, int bitsToUse);
  * @return
  * resulting new image
  */
-newImage encodeTextInsideAnImage(FILE* sourceImage, FILE* textToHide);
+newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide);
+
 /**
  * Find hidden text inside an image.
  * Has the opposite effect of encodeTextInsideAnImage().
@@ -63,7 +74,7 @@ newImage encodeTextInsideAnImage(FILE* sourceImage, FILE* textToHide);
  * @return
  * the hidden text
  */
-char** decodeTextFromImage(FILE* imageWithHiddenText);
+char **decodeTextFromImage(FILE *imageWithHiddenText);
 
 /**
  * Convert an image into seemingly nonsense text.
@@ -72,7 +83,7 @@ char** decodeTextFromImage(FILE* imageWithHiddenText);
  * @return
  * the resulting text
  */
-char** imageToText(FILE* image);
+char **imageToText(FILE *image);
 
 /**
  * Create an image from some text.
@@ -82,8 +93,17 @@ char** imageToText(FILE* image);
  * @return
  * the image that was contained
  */
-newImage imageFromTextFile(FILE* textFile);
+newImage imageFromTextFile(FILE *textFile);
 
+/**
+ * Reads the bmp file from given file.
+ * Saves it in an array which it returns
+ * @param imageFile
+ * image to be read
+ * @return
+ * the array with the data
+ */
+byte *readImage(FILE *imageFile);
 
 
 #endif //BMPLIB_BMPLIB_H

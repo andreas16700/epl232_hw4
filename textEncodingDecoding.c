@@ -18,7 +18,7 @@ PRIVATE int *createPermutationFunction(int N, unsigned int systemkey);
 newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide) {
     int systemkey = 1;
     char *text = readText(textToHide);
-
+    int paddingIndex = 0;
 }
 
 PRIVATE char *readText(FILE *textToHide) {
