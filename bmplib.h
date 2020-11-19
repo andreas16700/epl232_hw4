@@ -61,20 +61,26 @@ newImage decodeHiddenImageFromEncodedImage(FILE *encryptedImage, int bitsToUse);
  * image to hide the text in
  * @param textToHide
  * the text to hide
+ * @param sourceImageName
+ * the name of the file that contains the image
+ * @param key
+ * the systemkey that is going to be used t encrypt the text
  * @return
  * resulting new image
  */
-newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide);
+newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide, char *sourceImageName, int key);
 
 /**
  * Find hidden text inside an image.
  * Has the opposite effect of encodeTextInsideAnImage().
  * @param imageWithHiddenText
+ * @param key
+ * key to decrypt text
  * image that text was hidden into
  * @return
  * the hidden text
  */
-char **decodeTextFromImage(FILE *imageWithHiddenText);
+char **decodeTextFromImage(FILE *imageWithHiddenText, unsigned int key, int length);
 
 /**
  * Convert an image into seemingly nonsense text.

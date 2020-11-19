@@ -1,24 +1,40 @@
 //
-// Created by sohae on 18/11/2020.
+// Created by Sohaib on 18/11/2020.
 //
 #include "bmplib.h"
 #include <string.h>
 #include <stdlib.h>
 
+#define IMAGERETURNTYPE char *
+
 PRIVATE char *readText(FILE *textToHide);
 
 PRIVATE int getBit(char *m, int n);
 
-newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide);
-
-char **decodeTextFromImage(FILE *imageWithHiddenText);
-
 PRIVATE int *createPermutationFunction(int N, unsigned int systemkey);
 
-newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide) {
-    int systemkey = 1;
+newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide, char *sourceImageName, int key) {
+    FILE *fp = fopen("new", "wb");
     char *text = readText(textToHide);
-    int paddingIndex = 0;
+    byte *data = readImage(sourceImage);
+
+    //not sure if this is correct for big images
+    dword sizeOfImage = data[2] - 54;
+
+    char *permutations = createPermutationFunction(sizeOfImage, key);
+
+    for (int i = 0; i < (i + strlen(text)) * 8; i++) {
+        short bit = getBit(text, i);
+        int posOfBit = permutations[i];
+        data[posOfBit] & ~0x1 | permutations[i];
+    }
+
+    char *newName = strcat(strcat("new-", sourceImageName), ".bmp");
+    FILE *newImage = fopen(newName, "wb");
+    for (int i = 0; i < sizeOfImage; i++) {
+        fputc(data[i], newImage);
+    }
+    return newName;
 }
 
 PRIVATE char *readText(FILE *textToHide) {
@@ -46,8 +62,31 @@ PRIVATE char *readText(FILE *textToHide) {
     return text;
 }
 
+char **decodeTextFromImage(FILE *imageWithHiddenText, unsigned int key, int length) {
+    byte *imageData = readImage(imageWithHiddenText);
+    dword sizeOfImage = imageData[2] - 54;
+    int *permutate = createPermutationFunction(sizeOfImage, key);
+    for (int i = 0; i < (i + length) * 8; i++) {
+        int posOfBbyte = permutate[i];
+        data[posOfBit] & ~0x1 | permutations[i];
+    }
 
-char **decodeTextFromImage(FILE *imageWithHiddenText) {
+}
+
+int *dePermutate(int *array, int N, unsigned int systemkey) {
+    srand(systemkey);
+    //creates array of permutations
+    int *arrayOfRand = (int *) malloc(sizeof(int) * 2 * N);
+    for (int j = 0; j < 2 * N; j += 2) {
+        arrayOfRand[j] = rand() % N;
+        arrayOfRand[j + 1] = rand() % N;
+    }
+    for (int i = 2 * N - 1; i - 1 >= 0; i -= 2) {
+        int temp = array[arrayOfRand[i]];
+        array[arrayOfRand[i]] = array[arrayOfRand[i - 1]];
+        array[arrayOfRand[i - 1]] = temp;
+    }
+    return array;
 
 }
 
@@ -86,5 +125,6 @@ PRIVATE int *createPermutationFunction(int N, unsigned int systemkey) {
 int main(int argc, char *argv[]){
     char str = {'a', 'b', '/0'};
     printf("here %d\n", getBit(&str, 0));
+
 }
 #endif
