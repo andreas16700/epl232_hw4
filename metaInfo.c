@@ -1,13 +1,11 @@
 //
 // Created by sohae on 19/11/2020.
 //
-#ifndef METALINFO_
-#define METALINFO_
+#ifndef META_INFO
+#define META_INFO
 #include "bmplib.h"
+#include "Shared.h"
 
-PRIVATE unsigned long getLongFrom4Bytes(byte *b);
-
-PRIVATE unsigned long getLongFrom2Bytes(byte *b);
 
 void getMetaInfo(char *bmpImage) {
     byte *data = readImage(bmpImage);
@@ -35,15 +33,5 @@ void getMetaInfo(char *bmpImage) {
     printf("biClrImportant: %lu\n", getLongFrom4Bytes(&data[50]));
 }
 
-PUBLIC unsigned long getLongFrom4Bytes(byte *b) {
-    unsigned long retval = (unsigned long) b[3] << 24 | (unsigned long) b[2] << 16;
-    retval |= (unsigned long) b[1] << 8 | b[0];
-    return retval;
-}
 
-PUBLIC unsigned long getLongFrom2Bytes(byte *b) {
-    unsigned long retval = (unsigned long) b[2] << 8;
-    retval |= b[0];
-    return retval;
-}
 #endif

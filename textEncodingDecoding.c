@@ -4,7 +4,7 @@
 #include "bmplib.h"
 #include <string.h>
 #include <stdlib.h>
-#include "metaInfo.c"
+#include "Shared.h"
 
 #define IMAGERETURNTYPE char *
 

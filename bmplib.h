@@ -5,12 +5,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "Shared.h"
 
 typedef struct IMAGERETURNTYPE *newImage;
 
-typedef unsigned char byte;
-typedef unsigned short int word;
-typedef unsigned int dword;
+
 
 /**
  * Prints the meta info of the header file of a bitmap image
@@ -54,7 +53,7 @@ FILE *encodeImageWithinImage(char *shellImageName, char *hiddenImageName, int bi
  * @return
  * resulting new image
  */
-FILE *decodeHiddenImageFromEncodedImage(char *fileNameOfImageWithHiddenImage, int bitsToUse);
+void decodeHiddenImageFromEncodedImage(char *fileNameOfImageWithHiddenImage, int bitsToUse);
 
 /**
  * Hide some text inside an image

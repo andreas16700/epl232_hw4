@@ -5,26 +5,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "bmplib.h"
-#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
-#define BYTE_TO_BINARY(byte)  \
-  (byte & 0x80 ? '1' : '0'), \
-  (byte & 0x40 ? '1' : '0'), \
-  (byte & 0x20 ? '1' : '0'), \
-  (byte & 0x10 ? '1' : '0'), \
-  (byte & 0x08 ? '1' : '0'), \
-  (byte & 0x04 ? '1' : '0'), \
-  (byte & 0x02 ? '1' : '0'), \
-  (byte & 0x01 ? '1' : '0')
+#include "Shared.h"
 #define DEBUG_MERGE 0
-#define HEADER_BYTE_LENGTH 54
 //this file implements the following functions
 //newImage encodeImageWithinImage(FILE* shellImage, FILE* hiddenImage, int bitsToUse);
 //newImage decodeHiddenImageFromEncodedImage(FILE* encryptedImage, int bitsToUse);
 
-PRIVATE void ensureNotNull(void* pntr){
-    if (pntr==NULL)
-        exit(-1);
-}
+
 
 
 PRIVATE byte mergeBytes(byte importantByte, byte lessImportantByte, int bitsToUse) {
@@ -108,12 +95,6 @@ PRIVATE void writeMergedImageData(FILE* shellImage
         lessImportantByte = fgetc(secretImage);
     }
 }
-//TODO do bmc checks
-int isValidBMPImage(FILE* file){
-    ensureNotNull(file);
-    //other checks here
-    return 1;
-}
 PRIVATE void appendBeforeExtension(char* slot, char* existing, char* toAppend){
     slot[0]='\0';
     int existingLength = strlen(existing);
@@ -133,12 +114,8 @@ PRIVATE void appendBeforeExtension(char* slot, char* existing, char* toAppend){
 PUBLIC FILE * encodeImageWithinImage(char *shellImageName, char *hiddenImageName, int bitsToUse){
     FILE* shellImage = fopen(shellImageName,"r");
     FILE* hiddenImage = fopen(hiddenImageName,"r");
-    if (!(
-            isValidBMPImage(shellImage)
-            &&
-            isValidBMPImage(hiddenImage)
-            ))
-        exit(-1);
+    ensureIsValidBMP(shellImage);
+    ensureIsValidBMP(hiddenImage);
     char newName[strlen(shellImageName)+5];
     appendBeforeExtension(newName,shellImageName,"-new");
 
@@ -152,23 +129,23 @@ PUBLIC FILE * encodeImageWithinImage(char *shellImageName, char *hiddenImageName
     rewind(output);
     return output;
 }
-FILE* decodeHiddenImageFromEncodedImage(char* fileNameOfImageWithHiddenImage, int bitsToUse){
+PRIVATE void doneWithFile(FILE* file){
+    fflush(file);
+    fclose(file);
+}
+PUBLIC void decodeHiddenImageFromEncodedImage(char* fileNameOfImageWithHiddenImage, int bitsToUse){
     FILE* imageWithHiddenImage = fopen(fileNameOfImageWithHiddenImage, "r");
-    if (!isValidBMPImage(imageWithHiddenImage))
-        exit(-1);
+    ensureIsValidBMP(imageWithHiddenImage);
     char newName[strlen(fileNameOfImageWithHiddenImage)+5];
     appendBeforeExtension(newName,fileNameOfImageWithHiddenImage,"-new");
     FILE* extractedImage = fopen(newName,"w");
     copyHeader(imageWithHiddenImage,extractedImage);
     extractImageData(imageWithHiddenImage,extractedImage,bitsToUse);
-    fflush(extractedImage);
-    fclose(imageWithHiddenImage);
-    rewind(extractedImage);
-    return extractedImage;
+    doneWithFile(imageWithHiddenImage);
+    doneWithFile(extractedImage);
 }
 
 #ifdef ENCODEIMAGE_DEBUG
-#define ENCODEIMAGE_DEBUG
 int main(){
     //test here
 }
