@@ -6,5 +6,9 @@
 #include <stdio.h>
 int main(int argc, char *argv[]) {
     //printf("hello ");
-    encodeTextInsideAnImage("IMG_6855.bmp", "input.txt", 5);
+    getMetaInfo("tux-pirate.bmp");
+    encodeTextInsideAnImage("tux-pirate.bmp", "input.txt", 5);
+    printf("hi\n");
+    //char *txt = decodeTextFromImage("new-tux-pirate.bmp",5,112);
+    //printf("%s\n",txt);
 }

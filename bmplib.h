@@ -81,7 +81,7 @@ void encodeTextInsideAnImage(char *sourceImageFileName, char *textToHideFileName
  * @return
  * the hidden text
  */
-void decodeTextFromImage(char *imageWithHiddenTextFileName, unsigned int key, int length);
+char *decodeTextFromImage(char *imageWithHiddenTextFileName, unsigned int key, int length);
 
 /**
  * Convert an image into seemingly nonsense text.

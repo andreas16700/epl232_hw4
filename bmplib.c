@@ -12,12 +12,13 @@ byte *readImage(char *imageFile) {
         printf("Cant read bmp file!\n");
         return 0;
     }
-    byte b;
+    int signedB;
     int index = 0;
     int sizeOfArray = 54;
     byte *data = (byte *) malloc(sizeOfArray * sizeof(byte));
     do {
-        b = fgetc(fp);
+        signedB = fgetc(fp);
+        byte b = (byte) signedB;
         data[index] = b;
         index++;
         if (index >= sizeOfArray) {
@@ -29,6 +30,6 @@ byte *readImage(char *imageFile) {
             }
             data = temp;
         }
-    } while (b != EOF);
+    } while (signedB != EOF);
     return data;
 }
