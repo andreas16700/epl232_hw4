@@ -4,22 +4,22 @@
 #include "bmplib.h"
 #include <string.h>
 #include <stdlib.h>
+#include "metaInfo.c"
 
 #define IMAGERETURNTYPE char *
 
-PRIVATE char *readText(FILE *textToHide);
+PRIVATE char *readText(char *textToHide);
 
 PRIVATE int getBit(char *m, int n);
 
 PRIVATE int *createPermutationFunction(int N, unsigned int systemkey);
 
-newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide, char *sourceImageName, int key) {
-    FILE *fp = fopen("new", "wb");
+void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key) {
     char *text = readText(textToHide);
     byte *data = readImage(sourceImage);
 
     //not sure if this is correct for big images
-    dword sizeOfImage = data[2] - 54;
+    unsigned long sizeOfImage = getLongFrom4Bytes(data[2]);
 
     char *permutations = createPermutationFunction(sizeOfImage, key);
 
@@ -29,15 +29,16 @@ newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide, char *sour
         data[posOfBit] & ~0x1 | permutations[i];
     }
 
-    char *newName = strcat(strcat("new-", sourceImageName), ".bmp");
+    char *newName = (char *) malloc(sizeof(char) * (strlen(sourceImage)) + 5);
+    strcat("new-", sourceImage);
     FILE *newImage = fopen(newName, "wb");
     for (int i = 0; i < sizeOfImage; i++) {
         fputc(data[i], newImage);
     }
-    return newName;
 }
 
-PRIVATE char *readText(FILE *textToHide) {
+PRIVATE char *readText(char *textToHide) {
+    FILE *fp = fopen(textToHide, "r");
     if (textToHide == NULL) {
         printf("File of text to hide not found!\n");
         return 0;
@@ -62,7 +63,7 @@ PRIVATE char *readText(FILE *textToHide) {
     return text;
 }
 
-char **decodeTextFromImage(FILE *imageWithHiddenText, unsigned int key, int length) {
+void decodeTextFromImage(char *imageWithHiddenText, unsigned int key, int length) {
     byte *imageData = readImage(imageWithHiddenText);
     dword sizeOfImage = imageData[2] - 54;
     int *permutate = createPermutationFunction(sizeOfImage, key);

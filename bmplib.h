@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 typedef struct IMAGERETURNTYPE *newImage;
 
 typedef unsigned char byte;
@@ -16,7 +17,7 @@ typedef unsigned int dword;
  * @param bmpImage
  * the image file
  */
-void getMetaInfo(FILE *bmpImage);
+void getMetaInfo(char *bmpImage);
 
 /**
  * Applies the grayscale filter to a bitmap image to a new image file
@@ -41,7 +42,7 @@ newImage applyGrayscale(FILE *ofImage);
  * @return
  * the resulting image
  */
-FILE * encodeImageWithinImage(char *shellImageName, char *hiddenImageName, int bitsToUse);
+FILE *encodeImageWithinImage(char *shellImageName, char *hiddenImageName, int bitsToUse);
 
 /**
  * Recovers an image that was steganographically hidden inside another image.
@@ -53,7 +54,7 @@ FILE * encodeImageWithinImage(char *shellImageName, char *hiddenImageName, int b
  * @return
  * resulting new image
  */
-FILE * decodeHiddenImageFromEncodedImage(char *fileNameOfImageWithHiddenImage, int bitsToUse);
+FILE *decodeHiddenImageFromEncodedImage(char *fileNameOfImageWithHiddenImage, int bitsToUse);
 
 /**
  * Hide some text inside an image
@@ -68,7 +69,7 @@ FILE * decodeHiddenImageFromEncodedImage(char *fileNameOfImageWithHiddenImage, i
  * @return
  * resulting new image
  */
-newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide, char *sourceImageName, int key);
+void encodeTextInsideAnImage(char *sourceImageFileName, char *textToHideFileName, int key);
 
 /**
  * Find hidden text inside an image.
@@ -80,7 +81,7 @@ newImage encodeTextInsideAnImage(FILE *sourceImage, FILE *textToHide, char *sour
  * @return
  * the hidden text
  */
-char **decodeTextFromImage(FILE *imageWithHiddenText, unsigned int key, int length);
+void decodeTextFromImage(char *imageWithHiddenTextFileName, unsigned int key, int length);
 
 /**
  * Convert an image into seemingly nonsense text.
@@ -109,7 +110,6 @@ newImage imageFromTextFile(FILE *textFile);
  * @return
  * the array with the data
  */
-byte *readImage(FILE *imageFile);
-
+byte *readImage(char *imageFile);
 
 #endif //BMPLIB_BMPLIB_H

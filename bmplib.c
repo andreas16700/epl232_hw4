@@ -1,12 +1,13 @@
 #include "bmplib.h"
 
-byte *readImage(FILE *imageFile);
+byte *readImage(char *imageFile);
 
 void hello(void) {
     printf("Hello, World!\n");
 }
 
-byte *readImage(FILE *imageFile) {
+byte *readImage(char *imageFile) {
+    FILE *fp = fopen(imageFile, "rb");
     if (imageFile == NULL) {
         printf("Cant read bmp file!\n");
         return 0;
@@ -16,7 +17,7 @@ byte *readImage(FILE *imageFile) {
     int sizeOfArray = 54;
     byte *data = (byte *) malloc(sizeOfArray * sizeof(byte));
     do {
-        b = fgetc(imageFile);
+        b = fgetc(fp);
         data[index] = b;
         index++;
         if (index >= sizeOfArray) {

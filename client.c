@@ -5,5 +5,6 @@
 #include "bmplib.h"
 #include <stdio.h>
 int main(int argc, char *argv[]) {
-    printf("hello ");
+    //printf("hello ");
+    encodeTextInsideAnImage("IMG_6855.bmp", "input.txt", 5);
 }
