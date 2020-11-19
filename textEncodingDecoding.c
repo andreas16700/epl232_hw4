@@ -66,9 +66,22 @@ char **decodeTextFromImage(FILE *imageWithHiddenText, unsigned int key, int leng
     byte *imageData = readImage(imageWithHiddenText);
     dword sizeOfImage = imageData[2] - 54;
     int *permutate = createPermutationFunction(sizeOfImage, key);
+    char *decodedText = (char *) malloc(sizeof(char) * (length + 1));
+    int bitCnt = 7;
+    int charCounter = 0;
+    char charTemp = 0;
     for (int i = 0; i < (i + length) * 8; i++) {
         int posOfBbyte = permutate[i];
-        data[posOfBit] & ~0x1 | permutations[i];
+        int bit = imageData[posOfBbyte] & 0x1;
+        if (bitCnt < 0) {
+            bitCnt = 7;
+            decodedText[charCounter] = charTemp;
+            charCounter++;
+            charTemp = 0;
+        }
+        bit = bit << bitCnt;
+        charTemp = charTemp | bit;
+        bitCnt--;
     }
 
 }
@@ -93,9 +106,9 @@ int *dePermutate(int *array, int N, unsigned int systemkey) {
 PRIVATE int getBit(char *m, int n) {
     if (n < 0 || n > 8 * strlen(m))
         return 0;
-    int byte = m[n / 8];
+    int byt = m[n / 8];
     int posInByte = 7 - (n % 8);
-    int found = byte & (1 << posInByte);
+    int found = byt & (1 << posInByte);
     if (found > 0)
         return 1;
     return 0;
