@@ -14,6 +14,7 @@ PRIVATE int getBit(char *m, int n);
 
 PRIVATE int *createPermutationFunction(int N, unsigned int systemkey);
 
+PRIVATE byte modifyBit(byte n, int p, int b);
 //PUBLIC unsigned long getLongFrom4Bytes(byte *b);
 
 //PUBLIC unsigned long getLongFrom2Bytes(byte *b);
@@ -22,16 +23,13 @@ void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key) {
     char *text = readText(textToHide);
     byte *data = readImage(sourceImage);
 
-    //not sure if this is correct for big images
     unsigned long sizeOfImage = getLongFrom4Bytes(data[34], data[35], data[36], data[37]);
 
-    char *permutations = createPermutationFunction(sizeOfImage, key);
-
-    for (int i = 0; i < (1 + strlen(text)) * 8; i++) {
-        byte bit = getBit(text, i);
+    int *permutations = createPermutationFunction(sizeOfImage, key);
+    for (int i = 0; i < strlen(text) * 8; i++) {
+        int bit = getBit(text, i);
         int posOfByte = permutations[i];
-        //this fucks it up
-        data[54 + posOfByte] = (data[54 + posOfByte] & ~0x1) | bit;
+        data[54 + posOfByte] = modifyBit(data[54 + posOfByte], 0, bit);
     }
 
     char *newName = (char *) malloc(sizeof(char) * (strlen(sourceImage)) + 5);
@@ -40,16 +38,22 @@ void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key) {
     strcpy(newName, "new-");
     strcat(newName, sourceImage);
     FILE *newImage = fopen(newName, "wb");
-    for (int i = 0; i < sizeOfImage+54; i++) {
+    for (int i = 0; i < sizeOfImage + 54; i++) {
         fputc(data[i], newImage);
     }
+    fclose(newImage);
+}
+
+PRIVATE byte modifyBit(byte n, int p, int b) {
+    byte mask = 1 << p;
+    return (n & ~mask) | ((b << p) & mask);
 }
 
 PRIVATE char *readText(char *textToHide) {
     FILE *fp = fopen(textToHide, "r");
     if (textToHide == NULL) {
         printf("File of text to hide not found!\n");
-        return 0;
+        exit(0);
     }
     char c;
     //creating array chars
@@ -68,37 +72,39 @@ PRIVATE char *readText(char *textToHide) {
         cntChar++;
     }
     text[cntChar] = '\0';
+    fclose(fp);
     return text;
 }
 
 char *decodeTextFromImage(char *imageWithHiddenText, unsigned int key, int length) {
     byte *imageData = readImage(imageWithHiddenText);
+
     unsigned long sizeOfImage = getLongFrom4Bytes(imageData[34], imageData[35], imageData[36], imageData[37]);
-    int *permutate = createPermutationFunction(sizeOfImage, key);
+
+    int *permutations = createPermutationFunction(sizeOfImage, key);
     char *decodedText = (char *) malloc(sizeof(char) * (length + 1));
     int bitCnt = 7;
     int charCounter = 0;
-    unsigned char charTemp = 0;
-    for (int i = 0; i < (1 + length) * 8; i++) {
-        int posOfBbyte = permutate[i];
+    byte charTemp = 0;
+    for (int i = 0; i < length * 8; i++) {
+        int posOfBbyte = permutations[i];
         int bit = imageData[posOfBbyte + 54] & 0x1;
+        bit = bit << bitCnt;
+        charTemp = charTemp | bit;
+        bitCnt--;
         if (bitCnt < 0) {
             bitCnt = 7;
             decodedText[charCounter] = charTemp;
             charCounter++;
             charTemp = 0;
         }
-        bit = bit << bitCnt;
-        charTemp = charTemp | bit;
-        bitCnt--;
-        if (i > 900)
-            printf("hihihiihih\n");
     }
+    decodedText[length] = '\0';
     return decodedText;
 
 }
 
-int *dePermutate(int *array, int N, unsigned int systemkey) {
+PRIVATE int *dePermutate(int *array, int N, unsigned int systemkey) {
     srand(systemkey);
     //creates array of permutations
     int *arrayOfRand = (int *) malloc(sizeof(int) * 2 * N);

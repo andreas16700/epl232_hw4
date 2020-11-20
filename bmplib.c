@@ -8,7 +8,7 @@ void hello(void) {
 
 byte *readImage(char *imageFile) {
     FILE *fp = fopen(imageFile, "rb");
-    if (imageFile == NULL) {
+    if (fp == NULL) {
         printf("Cant read bmp file!\n");
         return 0;
     }
@@ -31,5 +31,6 @@ byte *readImage(char *imageFile) {
             data = temp;
         }
     } while (signedB != EOF);
+    fclose(fp);
     return data;
 }
