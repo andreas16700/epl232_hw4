@@ -15,6 +15,8 @@ PRIVATE int getBit(char *m, int n);
 PRIVATE int *createPermutationFunction(int N, unsigned int systemkey);
 
 PRIVATE byte modifyBit(byte n, int p, int b);
+
+PRIVATE void createNewImage(char *nameOfNewImage, byte *data);
 //PUBLIC unsigned long getLongFrom4Bytes(byte *b);
 
 //PUBLIC unsigned long getLongFrom2Bytes(byte *b);
@@ -37,11 +39,7 @@ void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key) {
         exit(0);
     strcpy(newName, "new-");
     strcat(newName, sourceImage);
-    FILE *newImage = fopen(newName, "wb");
-    for (int i = 0; i < sizeOfImage + 54; i++) {
-        fputc(data[i], newImage);
-    }
-    fclose(newImage);
+    createNewImage(newName, data);
 }
 
 PRIVATE byte modifyBit(byte n, int p, int b) {
@@ -149,6 +147,15 @@ PRIVATE int *createPermutationFunction(int N, unsigned int systemkey) {
         perm[val2] = temp;
     }
     return perm;
+}
+
+PRIVATE void createNewImage(char *nameOfNewImage, byte *data) {
+    unsigned long sizeOfImage = getLongFrom4Bytes(data[34], data[35], data[36], data[37]);
+    FILE *newImage = fopen(nameOfNewImage, "wb");
+    for (int i = 0; i < sizeOfImage + 54; i++) {
+        fputc(data[i], newImage);
+    }
+    fclose(newImage);
 }
 
 #define DEBUG_TEXTENCODINGDECODING

@@ -36,15 +36,15 @@ void getMetaInfo(char *bmpImage) {
     printf("biClrImportant: %lu\n", getLongFrom4Bytes(data[50], data[51], data[52], data[53]));
 }
 
-PUBLIC unsigned long getLongFrom4Bytes(byte b1, byte b2, byte b3, byte b4) {
-    unsigned long retval = (unsigned long) b4 << 24 | (unsigned long) b3 << 16;
-    retval |= (unsigned long) b2 << 8 | b1;
+PUBLIC unsigned long getLongFrom4Bytes(byte by1, byte by2, byte by3, byte by4) {
+    unsigned long retval = (unsigned long) by4 << 24 | (unsigned long) by3 << 16;
+    retval |= (unsigned long) by2 << 8 | by1;
     return retval;
 }
 
-PUBLIC unsigned long getLongFrom2Bytes(byte b1, byte b2) {
-    unsigned long retval = (unsigned long) b2 << 8;
-    retval |= b1;
+PUBLIC unsigned long getLongFrom2Bytes(byte by1, byte by2) {
+    unsigned long retval = (unsigned long) by2 << 8;
+    retval |= by1;
     return retval;
 }
 
