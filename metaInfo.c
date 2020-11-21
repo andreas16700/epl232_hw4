@@ -6,6 +6,9 @@
 #include "bmplib.h"
 #include "Shared.h"
 
+PUBLIC unsigned long getLongFrom4Bytes(byte b1, byte b2, byte b3, byte b4);
+
+PUBLIC unsigned long getLongFrom2Bytes(byte b1, byte b2);
 
 void getMetaInfo(char *bmpImage) {
     byte *data = readImage(bmpImage);
@@ -33,5 +36,16 @@ void getMetaInfo(char *bmpImage) {
     printf("biClrImportant: %lu\n", getLongFrom4Bytes(&data[50]));
 }
 
+PUBLIC unsigned long getLongFrom4Bytes(byte b1, byte b2, byte b3, byte b4) {
+    unsigned long retval = (unsigned long) b4 << 24 | (unsigned long) b3 << 16;
+    retval |= (unsigned long) b2 << 8 | b1;
+    return retval;
+}
+
+PUBLIC unsigned long getLongFrom2Bytes(byte b1, byte b2) {
+    unsigned long retval = (unsigned long) b2 << 8;
+    retval |= b1;
+    return retval;
+}
 
 #endif

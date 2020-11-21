@@ -2,9 +2,6 @@
 #include "Shared.h"
 
 
-void hello(void) {
-    printf("Hello, World!\n");
-}
 byte* readOnlyImageData(FILE* image){
     rewind(image);
     for (int i = 0; i < HEADER_BYTE_LENGTH; ++i)
@@ -35,7 +32,7 @@ byte* readOnlyImageData(FILE* image){
 }
 byte *readImage(char *imageFile) {
     FILE *fp = fopen(imageFile, "rb");
-    if (imageFile == NULL) {
+    if (fp == NULL) {
         printf("Cant read bmp file!\n");
         return 0;
     }
@@ -61,5 +58,6 @@ byte *readImage(char *imageFile) {
         readByte = fgetc(fp);
         b = (byte) readByte;
     }
+    fclose(fp);
     return data;
 }
