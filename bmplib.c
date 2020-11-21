@@ -1,12 +1,38 @@
 #include "bmplib.h"
 #include "Shared.h"
 
-byte *readImage(char *imageFile);
 
 void hello(void) {
     printf("Hello, World!\n");
 }
+byte* readOnlyImageData(FILE* image){
+    rewind(image);
+    for (int i = 0; i < HEADER_BYTE_LENGTH; ++i)
+        fgetc(image);
 
+    byte b;
+    int readByte;
+    int index = 0;
+    int sizeOfArray = 54;
+    byte *data = (byte *) malloc(sizeOfArray * sizeof(byte));
+    readByte = fgetc(image);
+    b = (byte) readByte;
+    while(readByte != EOF) {
+        data[index++] = b;
+        if (index >= sizeOfArray) {
+            sizeOfArray *= 2;
+            byte *temp = (byte *) realloc(data, sizeOfArray * sizeof(byte));
+            if (temp == NULL) {
+                printf("Cant allocate memory!\n");
+                return 0;
+            }
+            data = temp;
+        }
+        readByte = fgetc(image);
+        b = (byte) readByte;
+    }
+    return data;
+}
 byte *readImage(char *imageFile) {
     FILE *fp = fopen(imageFile, "rb");
     if (imageFile == NULL) {
@@ -14,22 +40,26 @@ byte *readImage(char *imageFile) {
         return 0;
     }
     byte b;
+    int readByte;
     int index = 0;
     int sizeOfArray = 54;
     byte *data = (byte *) malloc(sizeOfArray * sizeof(byte));
-    do {
-        b = fgetc(fp);
-        data[index] = b;
-        index++;
+    readByte = fgetc(fp);
+    b = (byte) readByte;
+    while(readByte != EOF) {
+
+        data[index++] = b;
         if (index >= sizeOfArray) {
-            byte *temp = (byte *) realloc(data, sizeOfArray * 2);
             sizeOfArray *= 2;
+            byte *temp = (byte *) realloc(data, sizeOfArray * sizeof(byte));
             if (temp == NULL) {
                 printf("Cant allocate memory!\n");
                 return 0;
             }
             data = temp;
         }
-    } while (b != EOF);
+        readByte = fgetc(fp);
+        b = (byte) readByte;
+    }
     return data;
 }

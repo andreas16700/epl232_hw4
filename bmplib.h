@@ -41,7 +41,7 @@ newImage applyGrayscale(FILE *ofImage);
  * @return
  * the resulting image
  */
-FILE *encodeImageWithinImage(char *shellImageName, char *hiddenImageName, int bitsToUse);
+void encodeImageWithinImage(const char *shellImageName,const char *hiddenImageName, int bitsToUse);
 
 /**
  * Recovers an image that was steganographically hidden inside another image.
@@ -53,7 +53,7 @@ FILE *encodeImageWithinImage(char *shellImageName, char *hiddenImageName, int bi
  * @return
  * resulting new image
  */
-void decodeHiddenImageFromEncodedImage(char *fileNameOfImageWithHiddenImage, int bitsToUse);
+void decodeHiddenImageFromEncodedImage(const char *fileNameOfImageWithHiddenImage, int bitsToUse);
 
 /**
  * Hide some text inside an image
@@ -83,23 +83,25 @@ void encodeTextInsideAnImage(char *sourceImageFileName, char *textToHideFileName
 void decodeTextFromImage(char *imageWithHiddenTextFileName, unsigned int key, int length);
 
 /**
- * Convert an image into seemingly nonsense text.
- * @param image
- * image to convert
- * @return
- * the resulting text
+ * Save an image as seemingly nonsense image.
+ * @param text
+ * text to save as image
+ * @param sampleImageName
+ * the resulting image will have the same dimensions as this sample image
+ * @param outputFileName
+ * name to save the resulting image
  */
-char **imageToText(FILE *image);
+void saveTextAsImage(String* text, char* sampleImageName, char* outputFileName);
 
-/**
- * Create an image from some text.
- * Reverses imageToText(FILE* image).
- * @param textFile
- * text that contains image data
- * @return
- * the image that was contained
- */
-newImage imageFromTextFile(FILE *textFile);
+ /**
+  * Recover text stored as image.
+  * Reverses saveTextAsImage(String* text, char* sampleImageName, char* outputFileName).
+  * @param imageFileName
+  * image that was converted from text
+  * @param outputFileName
+  * name of text file to write
+  */
+void textFromImage(char* imageFileName, char* outputFileName);
 
 /**
  * Reads the bmp file from given file.
@@ -110,5 +112,6 @@ newImage imageFromTextFile(FILE *textFile);
  * the array with the data
  */
 byte *readImage(char *imageFile);
+byte* readOnlyImageData(FILE* image);
 
 #endif //BMPLIB_BMPLIB_H
