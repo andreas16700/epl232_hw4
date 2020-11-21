@@ -134,8 +134,8 @@ PRIVATE int *createPermutationFunction(int N, unsigned int systemkey) {
     return perm;
 }
 
-#define DEBUG_TEXTENCODINGDECODING
-#ifndef DEBUG_TEXTENCODINGDECODING
+//#define DEBUG_TEXTENCODINGDECODING
+#ifdef DEBUG_TEXTENCODINGDECODING
 int main(int argc, char *argv[]){
     char str = {'a', 'b', '/0'};
     printf("here %d\n", getBit(&str, 0));
