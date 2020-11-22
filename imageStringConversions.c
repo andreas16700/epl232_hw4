@@ -53,8 +53,10 @@ void convertAndWriteTextAsImageData(String* text, FILE* image, Dimensions imageD
 void saveTextAsImage(const char *textFileName, const char *sampleImageName) {
     String* text = readTextFile(textFileName);
     FILE* sample = fopen(sampleImageName,"rb");
+    ensureFileExists(sample,sampleImageName);
     char* outputFileName = addPrefix(sampleImageName,"new-");
     FILE* output = fopen(outputFileName,"wb");
+    ensureFileOpenedForWriting(output,outputFileName);
     ensureIsValidBMP(sample);
     ensureNotNull(output);
     copyHeader(sample,output);
@@ -208,6 +210,7 @@ void free2DPixelArray(pixel** pixels, Dimensions dimensions){
 }
 void textFromImage(char *imageFileName) {
     FILE* weirdImage = fopen(imageFileName,"rb");
+    ensureFileExists(weirdImage,imageFileName);
     ensureIsValidBMP(weirdImage);
     Dimensions dimensions = readDimensionsOfImage(weirdImage);
     byte* rawImageData = readOnlyImageData(weirdImage);

@@ -113,7 +113,7 @@ String* readTextFile(const char* filename){
 
     FILE* textFile = fopen(filename,"r");
     char* newLine = malloc(READ_FROMFILE_LINE_CAPACITY);
-    ensureNotNull(newLine);
+    ensureFileExists(textFile,filename);
     while (!feof(textFile)){
         fgets(newLine,READ_FROMFILE_LINE_CAPACITY,textFile);
         addStrCharArray(fileContents,newLine);
@@ -124,7 +124,7 @@ String* readTextFile(const char* filename){
 }
 void saveStringAsTextFile(String* string, char* fileName){
     FILE* file = fopen(fileName, "w");
-    ensureNotNull(fileName);
+    ensureFileOpenedForWriting(file,fileName);
     fputs(string->startAddress,file);
     fflush(file);
     fclose(file);
