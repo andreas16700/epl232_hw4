@@ -82,17 +82,7 @@ byte *readOnlyImageData(FILE *image);
 
 void exitWithMessage(const char *message);
 
-void ensureFileExists(FILE* file, char* filename){
-    if (file==NULL){
-        printf("File \"%s\" could not be found!",filename);
-        exitWithMessage("");
-    }
-}
-void ensureFileOpenedForWriting(FILE* file, char* filename){
-    if (file==NULL){
-        printf("File \"%s\" could not be opened for writing!",filename);
-        exitWithMessage("");
-    }
-}
+void ensureFileExists(FILE* file, char* filename);
+void ensureFileOpenedForWriting(FILE* file, char* filename);
 
 #endif //BMPLIB_SHARED_H

@@ -166,3 +166,15 @@ void createNewTextFile(char *nameOfNewTextFile, char *text, int length) {
     }
     fclose(newText);
 }
+void ensureFileExists(FILE* file, char* filename){
+    if (file==NULL){
+        printf("File \"%s\" could not be found!",filename);
+        exitWithMessage("");
+    }
+}
+void ensureFileOpenedForWriting(FILE* file, char* filename){
+    if (file==NULL){
+        printf("File \"%s\" could not be opened for writing!",filename);
+        exitWithMessage("");
+    }
+}
