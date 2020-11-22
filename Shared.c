@@ -149,7 +149,7 @@ void exitWithMessage(const char *message) {
 }
 
 void createNewImageFile(char *nameOfNewImage, byte *data) {
-    unsigned long sizeOfImage = getLongFrom4Bytes(data[34]);
+    unsigned long sizeOfImage = getLongFrom4Bytes(&data[34]);
     FILE *newImage = fopen(nameOfNewImage, "wb");
     ensureNotNull(newImage);
     for (int i = 0; i < sizeOfImage + 54; i++) {
