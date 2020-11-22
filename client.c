@@ -80,7 +80,7 @@ void choseOption(char* option, char*arguments[], int argumentCount){
                 exitWithMessage("Please specify the image name, the message's length and a filename to write the hidden text into.");
             if (!isNumber(arguments[1]))
                 exitWithMessage("Message length must be a number");
-            decodeTextFromImage(arguments[0],-5,toNumber(arguments[1]));
+            decodeTextFromImage(arguments[0],arguments[2],-5,toNumber(arguments[1]));
             break;
         case 6:
             if (argumentCount!=2)
