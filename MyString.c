@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "MyString.h"
-//#include "../shared/MemoryErrorHandling.h"
+#include "Shared.h"
 #define STARTING_CAPACITY 4
 #define READ_FROMFILE_LINE_CAPACITY 25
 
