@@ -6,10 +6,6 @@
 #include "bmplib.h"
 #include "Shared.h"
 
-PUBLIC unsigned long getLongFrom4Bytes(byte b1, byte b2, byte b3, byte b4);
-
-PUBLIC unsigned long getLongFrom2Bytes(byte b1, byte b2);
-
 void getMetaInfo(char *bmpImage) {
     byte *data = readImage(bmpImage);
     printf("BITMAP_FILE_HEADER\n"
@@ -34,18 +30,6 @@ void getMetaInfo(char *bmpImage) {
     printf("biYPelsPerMeter: %lu\n", getLongFrom4Bytes(&data[42]));
     printf("biClrUsed: %lu\n", getLongFrom4Bytes(&data[46]));
     printf("biClrImportant: %lu\n", getLongFrom4Bytes(&data[50]));
-}
-
-PUBLIC unsigned long getLongFrom4Bytes(byte by1, byte by2, byte by3, byte by4) {
-    unsigned long retval = (unsigned long) by4 << 24 | (unsigned long) by3 << 16;
-    retval |= (unsigned long) by2 << 8 | by1;
-    return retval;
-}
-
-PUBLIC unsigned long getLongFrom2Bytes(byte by1, byte by2) {
-    unsigned long retval = (unsigned long) by2 << 8;
-    retval |= by1;
-    return retval;
 }
 
 #endif

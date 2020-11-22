@@ -33,17 +33,6 @@ char* addPrefix(const char* current, const char* prefix){
         newName[newSize]='\0';
     return newName;
 }
-unsigned long getLongFrom4Bytes(byte *b) {
-    unsigned long retval = (unsigned long) b[3] << 24 | (unsigned long) b[2] << 16;
-    retval |= (unsigned long) b[1] << 8 | b[0];
-    return retval;
-}
-
-unsigned long getLongFrom2Bytes(byte *b) {
-    unsigned long retval = (unsigned long) b[2] << 8;
-    retval |= b[0];
-    return retval;
-}
 int intFromNBytes(const byte* bytes, int n){
     unsigned int num=0;
     for (int i = n-1; i >= 0 ; --i) {
@@ -52,6 +41,14 @@ int intFromNBytes(const byte* bytes, int n){
     }
     return (signed)num;
 }
+unsigned int getLongFrom4Bytes(const byte *b) {
+    return (unsigned) intFromNBytes(b,4);
+}
+
+unsigned int getLongFrom2Bytes(const byte *b) {
+    return (unsigned) intFromNBytes(b,2);
+}
+
 void copyHeader(FILE* from, FILE* to){
     rewind(from);
     rewind(to);
@@ -76,4 +73,63 @@ Dimensions readDimensionsOfImage(FILE* image){
         biHeight[i]=fgetc(image);
     Dimensions dimensions={.biHeight=intFromNBytes(biHeight,4), .biWidth=intFromNBytes(biWidth,4)};
     return dimensions;
+}
+byte* readOnlyImageData(FILE* image){
+    rewind(image);
+    for (int i = 0; i < HEADER_BYTE_LENGTH; ++i)
+        fgetc(image);
+
+    byte b;
+    int readByte;
+    int index = 0;
+    int sizeOfArray = 54;
+    byte *data = (byte *) malloc(sizeOfArray * sizeof(byte));
+    readByte = fgetc(image);
+    b = (byte) readByte;
+    while(readByte != EOF) {
+        data[index++] = b;
+        if (index >= sizeOfArray) {
+            sizeOfArray *= 2;
+            byte *temp = (byte *) realloc(data, sizeOfArray * sizeof(byte));
+            if (temp == NULL) {
+                printf("Cant allocate memory!\n");
+                return 0;
+            }
+            data = temp;
+        }
+        readByte = fgetc(image);
+        b = (byte) readByte;
+    }
+    return data;
+}
+byte *readImage(char *imageFile) {
+    FILE *fp = fopen(imageFile, "rb");
+    if (fp == NULL) {
+        printf("Cant read bmp file!\n");
+        return 0;
+    }
+    byte b;
+    int readByte;
+    int index = 0;
+    int sizeOfArray = 54;
+    byte *data = (byte *) malloc(sizeOfArray * sizeof(byte));
+    readByte = fgetc(fp);
+    b = (byte) readByte;
+    while(readByte != EOF) {
+
+        data[index++] = b;
+        if (index >= sizeOfArray) {
+            sizeOfArray *= 2;
+            byte *temp = (byte *) realloc(data, sizeOfArray * sizeof(byte));
+            if (temp == NULL) {
+                printf("Cant allocate memory!\n");
+                return 0;
+            }
+            data = temp;
+        }
+        readByte = fgetc(fp);
+        b = (byte) readByte;
+    }
+    fclose(fp);
+    return data;
 }

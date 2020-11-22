@@ -103,15 +103,6 @@ void saveTextAsImage(String* text, char* sampleImageName, char* outputFileName);
   */
 void textFromImage(char* imageFileName, char* outputFileName);
 
-/**
- * Reads the bmp file from given file.
- * Saves it in an array which it returns
- * @param imageFile
- * image to be read
- * @return
- * the array with the data
- */
-byte *readImage(char *imageFile);
-byte* readOnlyImageData(FILE* image);
+
 
 #endif //BMPLIB_BMPLIB_H

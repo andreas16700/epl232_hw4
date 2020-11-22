@@ -25,12 +25,22 @@ typedef unsigned int dword;
 void ensureIsValidBMP(FILE* image);
 void ensureNotNull(void* pntr);
 char* addPrefix(const char* current, const char* prefix);
-unsigned long getLongFrom4Bytes(byte *b);
-unsigned long getLongFrom2Bytes(byte *b);
+unsigned int getLongFrom4Bytes(const byte *b);
+unsigned int getLongFrom2Bytes(const byte *b);
 typedef struct DIMENSIONS{
     int biWidth;
     int biHeight;
 }Dimensions;
 Dimensions readDimensionsOfImage(FILE* image);
 void copyHeader(FILE* from, FILE* to);
+/**
+ * Reads the bmp file from given file.
+ * Saves it in an array which it returns
+ * @param imageFile
+ * image to be read
+ * @return
+ * the array with the data
+ */
+byte *readImage(char *imageFile);
+byte* readOnlyImageData(FILE* image);
 #endif //BMPLIB_SHARED_H

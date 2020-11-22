@@ -25,7 +25,7 @@ void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key) {
     char *text = readText(textToHide);
     byte *data = readImage(sourceImage);
 
-    unsigned long sizeOfImage = getLongFrom4Bytes(data[34], data[35], data[36], data[37]);
+    unsigned long sizeOfImage = getLongFrom4Bytes(&data[34]);
 
     int *permutations = createPermutationFunction(sizeOfImage, key);
     for (int i = 0; i < strlen(text) * 8; i++) {
@@ -77,7 +77,7 @@ PRIVATE char *readText(char *textToHide) {
 char *decodeTextFromImage(char *imageWithHiddenText, unsigned int key, int length) {
     byte *imageData = readImage(imageWithHiddenText);
 
-    unsigned long sizeOfImage = getLongFrom4Bytes(imageData[34], imageData[35], imageData[36], imageData[37]);
+    unsigned long sizeOfImage = getLongFrom4Bytes(&imageData[34]);
 
     int *permutations = createPermutationFunction(sizeOfImage, key);
     char *decodedText = (char *) malloc(sizeof(char) * (length + 1));
@@ -150,7 +150,7 @@ PRIVATE int *createPermutationFunction(int N, unsigned int systemkey) {
 }
 
 PRIVATE void createNewImage(char *nameOfNewImage, byte *data) {
-    unsigned long sizeOfImage = getLongFrom4Bytes(data[34], data[35], data[36], data[37]);
+    unsigned long sizeOfImage = getLongFrom4Bytes(&data[34]);
     FILE *newImage = fopen(nameOfNewImage, "wb");
     for (int i = 0; i < sizeOfImage + 54; i++) {
         fputc(data[i], newImage);
