@@ -3,6 +3,7 @@
 //
 #include "Shared.h"
 #include "bmplib.h"
+#include <ctype.h>
 byte getBit(String* text
             ,int row, int col
             , int height, int width){
@@ -31,29 +32,22 @@ void writePixel(byte* rgb, FILE* image){
 void convertAndWriteTextAsImageData(String* text, FILE* image, Dimensions imageDimensions){
     int height = imageDimensions.biHeight;
     int width = imageDimensions.biWidth;
-//    int totalPixels = width*height;
-//    int totalWritten=0;
     int paddingBytes=4-((imageDimensions.biWidth*3)%4);
-    int needsPadding = paddingBytes>0 ? 1 : 0;
-    for (int row = height-1; row >= 0 ; row--) {
+    int needsPadding = paddingBytes!=4 ? 1 : 0;
+    for (int row = 0; row <imageDimensions.biHeight ; row++) {
         for (int col = 0; col < width; ++col) {
 
             byte bit = getBit(text, row, col, height, width);
             byte valueToWrite = bit*128;
             for (int i = 0; i < 3; ++i)
                 fputc(valueToWrite,image);
-//            totalWritten++;
         }
         if (needsPadding)
             for (int i = 0; i < paddingBytes; ++i)
-//                for (int j = 0; j < 3; ++j)
                     fputc((byte)0,image);
 
 
     }
-//    if (totalWritten<totalPixels)
-//        for (int i = 0; i < totalPixels-totalWritten; ++i)
-//             fputc(0,image);
 
 }
 void saveTextAsImage(String* text, char* sampleImageName, char* outputFileName){
@@ -85,6 +79,28 @@ int pixelToASCIIBit(pixel* p){
     exit(-5);
 
 }
+static void printchar(unsigned char theChar) {
+
+    switch (theChar) {
+
+        case '\n':
+            printf("%4s","\\n");
+            break;
+        case '\r':
+            printf("%4s","\\r");
+            break;
+        case '\t':
+            printf("%4s","\\t");
+            break;
+        default:
+            if ((theChar < 0x20) || (theChar > 0x7f)) {
+                printf("\\%04o", (unsigned char)theChar);
+            } else {
+                printf("%4c", theChar);
+            }
+            break;
+    }
+}
 void printCharsInPixelArray(pixel** pixels, Dimensions dimensions){
     char** char2d = malloc(dimensions.biHeight*sizeof(char*));
     for (int i = 0; i < dimensions.biHeight; ++i)
@@ -92,6 +108,7 @@ void printCharsInPixelArray(pixel** pixels, Dimensions dimensions){
     byte currentAscii=0;
     int readBits=0;
     for (int c = 0; c < dimensions.biWidth; ++c)
+//        for (int r = 0; r<dimensions.biHeight; ++r){
         for (int r = dimensions.biHeight-1; r >= 0; --r){
             currentAscii<<=(byte)1;
             currentAscii|=(byte)pixelToASCIIBit(&pixels[r][c]);
@@ -113,8 +130,12 @@ void printCharsInPixelArray(pixel** pixels, Dimensions dimensions){
         printf("%d\t",r);
         for (int c = 0; c < dimensions.biWidth; ++c) {
             char ch = char2d[r][c];
-            if (ch=='\n')
-                printf("%4s","nl");
+            if (!isalnum(ch)){
+                printchar(ch);
+            }
+
+//            if (ch=='\n')
+//                printf("%4s","nl");
             else
                 printf("%4c", ch);
         }
@@ -140,6 +161,7 @@ String* pixelsToString(const pixel** pixels, Dimensions dimensions){
     byte currentASCIIByte=0;
     int readBits=0;
     for (int col = 0; col < dimensions.biWidth; ++col) {
+//        for (int row = 0; row <dimensions.biHeight ; ++row) {
         for (int row = dimensions.biHeight-1; row >=0 ; --row) {
             pixel pixel1 = pixels[row][col];
             byte newBit = pixelToASCIIBit(&pixel1);
@@ -189,7 +211,7 @@ void textFromImage(char* imageFileName, char* outputFileName){
     fclose(weirdImage);
     pixel** pixels = to2DPixelArrayWithoutPadding(rawImageData,dimensions);
 //    printPixelArray(pixels,dimensions);
-    printCharsInPixelArray(pixels,dimensions);
+//    printCharsInPixelArray(pixels,dimensions);
     free(rawImageData);
     String* string = pixelsToString((const pixel **) pixels, dimensions);
     free2DPixelArray(pixels,dimensions);
@@ -217,9 +239,10 @@ void testGetBit(){
     }
 }
 int main(){
-    String* textFile = readTextFile("strFile.txt");
-    saveTextAsImage(textFile,"tux-pirate.bmp","outputImage.bmp");
-    destroyString(textFile);
-    textFromImage("outputImage.bmp","recoveredtp.txt");
+//    String* textFile = readTextFile("strFile.txt");
+//    saveTextAsImage(textFile,"tux-pirate.bmp","outputImage.bmp");
+//    destroyString(textFile);
+//    textFromImage("outputImage.bmp","recoveredtp.txt");
+    textFromImage("testStringToImage.bmp","recoveredtp.txt");
 }
 #endif
