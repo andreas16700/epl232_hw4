@@ -17,6 +17,7 @@ PUBLIC void applyGrayscale(char *imageFileName) {
         data[i + 1] = grayValue;
         data[i + 2] = grayValue;
     }
+
     createNewImageFile(addPrefix(imageFileName, "gray-"), data);
 }
 
