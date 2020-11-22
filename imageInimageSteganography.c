@@ -88,9 +88,11 @@ PUBLIC void encodeImageWithinImage(const char *shellImageName,const char *hidden
     ensureIsValidBMP(hiddenImage);
     char* newName = addPrefix(shellImageName,"new-");
     FILE* output = fopen(newName, "wb");
+    ensureFileOpenedForWriting(output,newName);
     copyHeader(hiddenImage,output);
     copyHeader(shellImage,output);
     writeMergedImageData(shellImage,hiddenImage,output,bitsToUse);
+    printf("Saved new image as \"%s\"\n",newName);
     doneWithFile(shellImage);
     doneWithFile(hiddenImage);
     doneWithFile(output);
@@ -101,8 +103,10 @@ PUBLIC void decodeHiddenImageFromEncodedImage(const char* fileNameOfImageWithHid
     ensureIsValidBMP(imageWithHiddenImage);
     char* newName = addPrefix(fileNameOfImageWithHiddenImage,"new-");
     FILE* extractedImage = fopen(newName,"wb");
+    ensureFileOpenedForWriting(extractedImage,newName);
     copyHeader(imageWithHiddenImage,extractedImage);
     extractImageData(imageWithHiddenImage,extractedImage,bitsToUse);
+    printf("Saved extracted image as\"%s\"\n",newName);
     doneWithFile(imageWithHiddenImage);
     doneWithFile(extractedImage);
 }

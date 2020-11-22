@@ -4,6 +4,7 @@
 #include "Shared.h"
 #include "bmplib.h"
 #include <ctype.h>
+
 byte getBit(String* text
             ,int row, int col
             , int height, int width){
@@ -61,6 +62,7 @@ void saveTextAsImage(const char *textFileName, const char *sampleImageName) {
     ensureNotNull(output);
     copyHeader(sample,output);
     convertAndWriteTextAsImageData(text,output,readDimensionsOfImage(sample));
+    printf("Saved image as \"%s\"\n",outputFileName);
     destroyString(text);
     fflush(output);
     fclose(output);
@@ -221,7 +223,9 @@ void textFromImage(char *imageFileName) {
     free(rawImageData);
     String* string = pixelsToString((const pixel **) pixels, dimensions);
     free2DPixelArray(pixels,dimensions);
-    saveStringAsTextFile(string,"outputText.txt");
+    char* outputName = "outputText.txt";
+    saveStringAsTextFile(string,outputName);
+    printf("Wrote text in \"%s\"\n",outputName);
     destroyString(string);
 }
 
