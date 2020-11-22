@@ -133,3 +133,7 @@ byte *readImage(char *imageFile) {
     fclose(fp);
     return data;
 }
+void exitWithMessage(const char* message){
+    printf("%s\n",message);
+    exit(-1);
+}

@@ -43,4 +43,6 @@ void copyHeader(FILE* from, FILE* to);
  */
 byte *readImage(char *imageFile);
 byte* readOnlyImageData(FILE* image);
+void exitWithMessage(const char* message);
+
 #endif //BMPLIB_SHARED_H
