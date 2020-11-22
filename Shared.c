@@ -28,9 +28,9 @@ void ensureIsValidBMP(FILE *image) {
 
 char *addPrefix(const char *current, const char *prefix) {
     int newSize = (int) strlen(current) + (int) strlen(prefix);
-    char *newName = malloc(newSize + 1);
+    char *newName = (char *) malloc(newSize + 1);
     ensureNotNull(newName);
-    strcat(newName, prefix);
+    strcpy(newName, prefix);
     strcat(newName, current);
     //just to be sure...
     if (newName[newSize] != '\0')
@@ -113,10 +113,7 @@ byte *readOnlyImageData(FILE *image) {
 
 byte *readImage(char *imageFile) {
     FILE *fp = fopen(imageFile, "rb");
-    if (fp == NULL) {
-        printf("Cant read bmp file!\n");
-        return 0;
-    }
+    ensureNotNull(fp);
     byte b;
     int readByte;
     int index = 0;
@@ -130,10 +127,7 @@ byte *readImage(char *imageFile) {
         if (index >= sizeOfArray) {
             sizeOfArray *= 2;
             byte *temp = (byte *) realloc(data, sizeOfArray * sizeof(byte));
-            if (temp == NULL) {
-                printf("Cant allocate memory!\n");
-                return 0;
-            }
+            ensureNotNull(temp);
             data = temp;
         }
         readByte = fgetc(fp);

@@ -9,8 +9,8 @@ PRIVATE int getGray(byte red, byte green, byte blue);
 
 PUBLIC void applyGrayscale(char *imageFileName) {
     byte *data = readImage(imageFileName);
-    int sizeOfFile = getLongFrom4Bytes(data[2]);
-    int sizeOfHeaders = sizeOfFile - getLongFrom4Bytes(data[34]);
+    int sizeOfFile = getLongFrom4Bytes(&data[2]);
+    int sizeOfHeaders = sizeOfFile - getLongFrom4Bytes(&data[34]);
     for (int i = sizeOfHeaders; i + 2 < sizeOfFile; i += 3) {
         int grayValue = getGray(data[i], data[i + 1], data[i + 2]);
         data[i] = grayValue;
