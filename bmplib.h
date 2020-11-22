@@ -74,13 +74,15 @@ void encodeTextInsideAnImage(char *sourceImageFileName, char *textToHideFileName
  * Find hidden text inside an image.
  * Has the opposite effect of encodeTextInsideAnImage().
  * @param imageWithHiddenText
+ * image that text was hidden into
+ * @param newFileName
+ * name of new file that decoded text will be printed in
  * @param key
  * key to decrypt text
- * image that text was hidden into
- * @return
- * the hidden text
+ * @param length
+ * length of text to be decoded
  */
-char *decodeTextFromImage(char *imageWithHiddenTextFileName, unsigned int key, int length);
+PUBLIC void decodeTextFromImage(char *imageWithHiddenText, char *newFileName, int key, int length);
 
 /**
  * Save an image as seemingly nonsense image.

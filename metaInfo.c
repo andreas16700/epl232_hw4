@@ -1,12 +1,10 @@
 //
 // Created by sohae on 19/11/2020.
 //
-#ifndef META_INFO
-#define META_INFO
 #include "bmplib.h"
 #include "Shared.h"
 
-void getMetaInfo(char *bmpImage) {
+PUBLIC void getMetaInfo(char *bmpImage) {
     byte *data = readImage(bmpImage);
     printf("BITMAP_FILE_HEADER\n"
            "==================");
@@ -31,5 +29,3 @@ void getMetaInfo(char *bmpImage) {
     printf("biClrUsed: %lu\n", getLongFrom4Bytes(&data[46]));
     printf("biClrImportant: %lu\n", getLongFrom4Bytes(&data[50]));
 }
-
-#endif

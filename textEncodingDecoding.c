@@ -4,24 +4,17 @@
 #include "bmplib.h"
 #include <string.h>
 #include <stdlib.h>
-//#include "metaInfo.c"
-
-#define IMAGERETURNTYPE char *
+#include "Shared.h"
 
 PRIVATE char *readText(char *textToHide);
 
 PRIVATE int getBit(char *m, int n);
 
-PRIVATE int *createPermutationFunction(int N, unsigned int systemkey);
+PRIVATE int *createPermutationFunction(int N, int key);
 
 PRIVATE byte modifyBit(byte n, int p, int b);
 
-PRIVATE void createNewImage(char *nameOfNewImage, byte *data);
-//PUBLIC unsigned long getLongFrom4Bytes(byte *b);
-
-//PUBLIC unsigned long getLongFrom2Bytes(byte *b);
-
-void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key) {
+PUBLIC void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key) {
     char *text = readText(textToHide);
     byte *data = readImage(sourceImage);
 
@@ -33,13 +26,7 @@ void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key) {
         int posOfByte = permutations[i];
         data[54 + posOfByte] = modifyBit(data[54 + posOfByte], 0, bit);
     }
-
-    char *newName = (char *) malloc(sizeof(char) * (strlen(sourceImage)) + 5);
-    if (newName == NULL)
-        exit(0);
-    strcpy(newName, "new-");
-    strcat(newName, sourceImage);
-    createNewImage(newName, data);
+    createNewImageFile(addPrefix(sourceImage, "new-"), data);
 }
 
 PRIVATE byte modifyBit(byte n, int p, int b) {
@@ -49,21 +36,16 @@ PRIVATE byte modifyBit(byte n, int p, int b) {
 
 PRIVATE char *readText(char *textToHide) {
     FILE *fp = fopen(textToHide, "r");
-    if (textToHide == NULL) {
-        printf("File of text to hide not found!\n");
-        exit(0);
-    }
+    ensureNotNull(fp);
     char c;
     //creating array chars
     char *text = (char *) malloc(sizeof(char) * 10);
+    ensureNotNull(text);
     int cntChar = 0;
     while ((c = fgetc(fp)) != EOF) {
         if (cntChar + 1 >= sizeof(text)) {
             char *temp = (char *) realloc(text, (sizeof(char) * (cntChar * 2)));
-            if (temp == NULL) {
-                printf("Cant allocate!\n");
-                return 0;
-            }
+            ensureNotNull(temp);
             text = temp;
         }
         text[cntChar] = c;
@@ -74,19 +56,20 @@ PRIVATE char *readText(char *textToHide) {
     return text;
 }
 
-char *decodeTextFromImage(char *imageWithHiddenText, unsigned int key, int length) {
+PUBLIC void decodeTextFromImage(char *imageWithHiddenText, char *newFileName, int key, int length) {
     byte *imageData = readImage(imageWithHiddenText);
 
     unsigned long sizeOfImage = getLongFrom4Bytes(&imageData[34]);
 
     int *permutations = createPermutationFunction(sizeOfImage, key);
     char *decodedText = (char *) malloc(sizeof(char) * (length + 1));
+    ensureNotNull(decodedText);
     int bitCnt = 7;
     int charCounter = 0;
     byte charTemp = 0;
     for (int i = 0; i < length * 8; i++) {
-        int posOfBbyte = permutations[i];
-        int bit = imageData[posOfBbyte + 54] & 0x1;
+        int posOfByte = permutations[i];
+        int bit = imageData[posOfByte + 54] & 0x1;
         bit = bit << bitCnt;
         charTemp = charTemp | bit;
         bitCnt--;
@@ -98,25 +81,7 @@ char *decodeTextFromImage(char *imageWithHiddenText, unsigned int key, int lengt
         }
     }
     decodedText[length] = '\0';
-    return decodedText;
-
-}
-
-PRIVATE int *dePermutate(int *array, int N, unsigned int systemkey) {
-    srand(systemkey);
-    //creates array of permutations
-    int *arrayOfRand = (int *) malloc(sizeof(int) * 2 * N);
-    for (int j = 0; j < 2 * N; j += 2) {
-        arrayOfRand[j] = rand() % N;
-        arrayOfRand[j + 1] = rand() % N;
-    }
-    for (int i = 2 * N - 1; i - 1 >= 0; i -= 2) {
-        int temp = array[arrayOfRand[i]];
-        array[arrayOfRand[i]] = array[arrayOfRand[i - 1]];
-        array[arrayOfRand[i - 1]] = temp;
-    }
-    return array;
-
+    createNewTextFile(newFileName, decodedText, length);
 }
 
 PRIVATE int getBit(char *m, int n) {
@@ -130,10 +95,11 @@ PRIVATE int getBit(char *m, int n) {
     return 0;
 }
 
-PRIVATE int *createPermutationFunction(int N, unsigned int systemkey) {
-    srand(systemkey);
+PRIVATE int *createPermutationFunction(int N, int key) {
+    srand(key);
     //creates array of permutations
     int *perm = (int *) malloc(N * sizeof(int));
+    ensureNotNull(perm);
     //initializes with i value
     for (int i = 0; i < N; i++) {
         perm[i] = i;
@@ -147,15 +113,6 @@ PRIVATE int *createPermutationFunction(int N, unsigned int systemkey) {
         perm[val2] = temp;
     }
     return perm;
-}
-
-PRIVATE void createNewImage(char *nameOfNewImage, byte *data) {
-    unsigned long sizeOfImage = getLongFrom4Bytes(&data[34]);
-    FILE *newImage = fopen(nameOfNewImage, "wb");
-    for (int i = 0; i < sizeOfImage + 54; i++) {
-        fputc(data[i], newImage);
-    }
-    fclose(newImage);
 }
 
 #define DEBUG_TEXTENCODINGDECODING

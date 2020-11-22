@@ -4,77 +4,85 @@
 
 #include <stdlib.h>
 #include "Shared.h"
-void ensureNotNull(void* pntr){
-    if (pntr==NULL) {
+
+void ensureNotNull(void *pntr) {
+    if (pntr == NULL) {
         printf("Null pointer!\n");
         exit(-1);
     }
 }
-int isValidBMP(FILE* file){
+
+int isValidBMP(FILE *file) {
     //TODO other checks here
     return 1;
 }
-void ensureIsValidBMP(FILE* image){
+
+void ensureIsValidBMP(FILE *image) {
     ensureNotNull(image);
-    if (!isValidBMP(image)){
+    if (!isValidBMP(image)) {
         printf("File is not a BMP image.\n");
         exit(-1);
     }
 
 }
-char* addPrefix(const char* current, const char* prefix){
+
+char *addPrefix(const char *current, const char *prefix) {
     int newSize = (int) strlen(current) + (int) strlen(prefix);
-    char* newName = malloc(newSize+1);
+    char *newName = malloc(newSize + 1);
     ensureNotNull(newName);
-    strcat(newName,prefix);
-    strcat(newName,current);
+    strcat(newName, prefix);
+    strcat(newName, current);
     //just to be sure...
-    if (newName[newSize]!='\0')
-        newName[newSize]='\0';
+    if (newName[newSize] != '\0')
+        newName[newSize] = '\0';
     return newName;
 }
-int intFromNBytes(const byte* bytes, int n){
-    unsigned int num=0;
-    for (int i = n-1; i >= 0 ; --i) {
-        num<<=(unsigned)8;
-        num|=bytes[i];
+
+int intFromNBytes(const byte *bytes, int n) {
+    unsigned int num = 0;
+    for (int i = n - 1; i >= 0; --i) {
+        num <<= (unsigned) 8;
+        num |= bytes[i];
     }
-    return (signed)num;
+    return (signed) num;
 }
+
 unsigned int getLongFrom4Bytes(const byte *b) {
-    return (unsigned) intFromNBytes(b,4);
+    return (unsigned) intFromNBytes(b, 4);
 }
 
 unsigned int getLongFrom2Bytes(const byte *b) {
-    return (unsigned) intFromNBytes(b,2);
+    return (unsigned) intFromNBytes(b, 2);
 }
 
-void copyHeader(FILE* from, FILE* to){
+void copyHeader(FILE *from, FILE *to) {
     rewind(from);
     rewind(to);
     for (int i = 0; i < HEADER_BYTE_LENGTH; ++i) {
         byte headerByte = fgetc(from);
-        fputc(headerByte,to);
+        fputc(headerByte, to);
     }
 }
-Dimensions readDimensionsOfImage(FILE* image){
+
+Dimensions readDimensionsOfImage(FILE *image) {
     rewind(image);
     //skip file header
-    int fileHeaderLength=14, infoHeaderBytesToSkip=4;
-    int bytesToSkip = fileHeaderLength+infoHeaderBytesToSkip;
+    int fileHeaderLength = 14, infoHeaderBytesToSkip = 4;
+    int bytesToSkip = fileHeaderLength + infoHeaderBytesToSkip;
     int dummy;
     for (int i = 0; i < bytesToSkip; ++i)
-        dummy=fgetc(image);
-    byte* biWidth = malloc(4*sizeof(byte));
-    byte* biHeight = malloc(4*sizeof(byte));
-    for (int i = 0; i <4; ++i)
-        biWidth[i]=fgetc(image);
-    for (int i = 0; i <4; ++i)
-        biHeight[i]=fgetc(image);
-    Dimensions dimensions={.biHeight=intFromNBytes(biHeight,4), .biWidth=intFromNBytes(biWidth,4)};
+        dummy = fgetc(image);
+    byte *biWidth = malloc(4 * sizeof(byte));
+    byte *biHeight = malloc(4 * sizeof(byte));
+    for (int i = 0; i < 4; ++i)
+        biWidth[i] = fgetc(image);
+    for (int i = 0; i < 4; ++i)
+        biHeight[i] = fgetc(image);
+    Dimensions dimensions = {.biHeight=intFromNBytes(biHeight, 4), .biWidth=intFromNBytes(biWidth, 4)};
     return dimensions;
 }
-byte* readOnlyImageData(FILE* image){
+
+byte *readOnlyImageData(FILE *image) {
     rewind(image);
     for (int i = 0; i < HEADER_BYTE_LENGTH; ++i)
         fgetc(image);
@@ -86,7 +94,7 @@ byte* readOnlyImageData(FILE* image){
     byte *data = (byte *) malloc(sizeOfArray * sizeof(byte));
     readByte = fgetc(image);
     b = (byte) readByte;
-    while(readByte != EOF) {
+    while (readByte != EOF) {
         data[index++] = b;
         if (index >= sizeOfArray) {
             sizeOfArray *= 2;
@@ -102,6 +110,7 @@ byte* readOnlyImageData(FILE* image){
     }
     return data;
 }
+
 byte *readImage(char *imageFile) {
     FILE *fp = fopen(imageFile, "rb");
     if (fp == NULL) {
@@ -115,7 +124,7 @@ byte *readImage(char *imageFile) {
     byte *data = (byte *) malloc(sizeOfArray * sizeof(byte));
     readByte = fgetc(fp);
     b = (byte) readByte;
-    while(readByte != EOF) {
+    while (readByte != EOF) {
 
         data[index++] = b;
         if (index >= sizeOfArray) {
@@ -133,7 +142,27 @@ byte *readImage(char *imageFile) {
     fclose(fp);
     return data;
 }
-void exitWithMessage(const char* message){
-    printf("%s\n",message);
+
+void exitWithMessage(const char *message) {
+    printf("%s\n", message);
     exit(-1);
+}
+
+void createNewImage(char *nameOfNewImage, byte *data) {
+    unsigned long sizeOfImage = getLongFrom4Bytes(data[34]);
+    FILE *newImage = fopen(nameOfNewImage, "wb");
+    ensureNotNull(newImage);
+    for (int i = 0; i < sizeOfImage + 54; i++) {
+        fputc(data[i], newImage);
+    }
+    fclose(newImage);
+}
+
+void createNewTextFile(char *nameOfNewTextFile, char *text, int length) {
+    FILE *newText = fopen(nameOfNewTextFile, "w");
+    ensureNotNull(newText);
+    for (int i = 0; i < length; i++) {
+        fputc(text[i], newText);
+    }
+    fclose(newText);
 }

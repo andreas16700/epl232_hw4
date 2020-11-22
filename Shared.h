@@ -4,6 +4,7 @@
 
 #ifndef BMPLIB_SHARED_H
 #define BMPLIB_SHARED_H
+
 #include <stdio.h>
 #include <string.h>
 #include "MyString.h"
@@ -22,17 +23,51 @@
 typedef unsigned char byte;
 typedef unsigned short int word;
 typedef unsigned int dword;
-void ensureIsValidBMP(FILE* image);
-void ensureNotNull(void* pntr);
-char* addPrefix(const char* current, const char* prefix);
+
+void ensureIsValidBMP(FILE *image);
+
+void ensureNotNull(void *pntr);
+
+char *addPrefix(const char *current, const char *prefix);
+
+/**
+ * returns an int from an array of 4 bytes.
+ * Big Endian
+ * @param b array of bytes
+ * @return the int
+ */
 unsigned int getLongFrom4Bytes(const byte *b);
+
+/**
+ * returns an int from an array of 2 bytes.
+ * Big Endian
+ * @param b array of bytes
+ * @return the int
+ */
 unsigned int getLongFrom2Bytes(const byte *b);
-typedef struct DIMENSIONS{
+
+/**
+ * Creates a new image from thr bivn array of bytes.
+ * creates a new file with the given name
+ * and moved the data from the given array to the file
+ * @param
+ * data array of bytes
+ * @param
+ * nameOfNewImage name of new bmp file
+ */
+void createNewImageFile(char *nameOfNewImage, byte *data);
+
+void createNewTextFile(char *nameOfNewTextFile, char *text, int length);
+
+typedef struct DIMENSIONS {
     int biWidth;
     int biHeight;
-}Dimensions;
-Dimensions readDimensionsOfImage(FILE* image);
-void copyHeader(FILE* from, FILE* to);
+} Dimensions;
+
+Dimensions readDimensionsOfImage(FILE *image);
+
+void copyHeader(FILE *from, FILE *to);
+
 /**
  * Reads the bmp file from given file.
  * Saves it in an array which it returns
@@ -42,7 +77,9 @@ void copyHeader(FILE* from, FILE* to);
  * the array with the data
  */
 byte *readImage(char *imageFile);
-byte* readOnlyImageData(FILE* image);
-void exitWithMessage(const char* message);
+
+byte *readOnlyImageData(FILE *image);
+
+void exitWithMessage(const char *message);
 
 #endif //BMPLIB_SHARED_H
