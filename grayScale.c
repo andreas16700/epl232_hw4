@@ -17,8 +17,8 @@ void applyGrayscale(char *imageFileName) {
     //int biWidth = getLongFrom4Bytes(data[18], data[19], data[20], data[21]);
     //int biHeight = getLongFrom4Bytes(data[22], data[23], data[24], data[25]);
     //int paddingPixels = getNumberOfPaddingPixels(biWidth);
-    int sizeOfFile = getLongFrom4Bytes(data[2], data[3], data[4], data[5]);
-    int sizeOfHeaders = sizeOfFile - getLongFrom4Bytes(data[34], data[35], data[36], data[37]);
+    int sizeOfFile = getLongFrom4Bytes(&data[2]);
+    int sizeOfHeaders = sizeOfFile - getLongFrom4Bytes(&data[34]);
     for (int i = sizeOfHeaders; i + 2 < sizeOfFile; i += 3) {
         int grayValue = getGray(data[i], data[i + 1], data[i + 2]);
         data[i] = grayValue;
@@ -44,7 +44,7 @@ int getNumberOfPaddingPixels(unsigned long biWidth) {
 }
 
 PRIVATE void createNewImage(char *nameOfNewImage, byte *data) {
-    unsigned long sizeOfImage = getLongFrom4Bytes(data[34], data[35], data[36], data[37]);
+    unsigned long sizeOfImage = getLongFrom4Bytes(&data[34]);
     FILE *newImage = fopen(nameOfNewImage, "wb");
     for (int i = 0; i < sizeOfImage + 54; i++) {
         fputc(data[i], newImage);
