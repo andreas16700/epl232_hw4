@@ -148,7 +148,7 @@ void exitWithMessage(const char *message) {
     exit(-1);
 }
 
-void createNewImage(char *nameOfNewImage, byte *data) {
+void createNewImageFile(char *nameOfNewImage, byte *data) {
     unsigned long sizeOfImage = getLongFrom4Bytes(data[34]);
     FILE *newImage = fopen(nameOfNewImage, "wb");
     ensureNotNull(newImage);
