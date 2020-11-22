@@ -84,14 +84,14 @@ char *decodeTextFromImage(char *imageWithHiddenTextFileName, unsigned int key, i
 
 /**
  * Save an image as seemingly nonsense image.
- * @param text
+ * @param textFileName
  * text to save as image
  * @param sampleImageName
  * the resulting image will have the same dimensions as this sample image
  * @param outputFileName
  * name to save the resulting image
  */
-void saveTextAsImage(String* text, char* sampleImageName, char* outputFileName);
+void saveTextAsImage(const char *textFileName, const char *sampleImageName);
 
  /**
   * Recover text stored as image.
@@ -101,7 +101,7 @@ void saveTextAsImage(String* text, char* sampleImageName, char* outputFileName);
   * @param outputFileName
   * name of text file to write
   */
-void textFromImage(char* imageFileName, char* outputFileName);
+ void textFromImage(char *imageFileName);
 
 
 
