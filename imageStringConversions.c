@@ -50,13 +50,16 @@ void convertAndWriteTextAsImageData(String* text, FILE* image, Dimensions imageD
     }
 
 }
-void saveTextAsImage(String* text, char* sampleImageName, char* outputFileName){
+void saveTextAsImage(const char *textFileName, const char *sampleImageName) {
+    String* text = readTextFile(textFileName);
     FILE* sample = fopen(sampleImageName,"rb");
+    char* outputFileName = addPrefix(sampleImageName,"new-");
     FILE* output = fopen(outputFileName,"wb");
     ensureIsValidBMP(sample);
     ensureNotNull(output);
     copyHeader(sample,output);
     convertAndWriteTextAsImageData(text,output,readDimensionsOfImage(sample));
+    destroyString(text);
     fflush(output);
     fclose(output);
     fclose(sample);
@@ -203,7 +206,7 @@ void free2DPixelArray(pixel** pixels, Dimensions dimensions){
         free(pixels[r]);
     free(pixels);
 }
-void textFromImage(char* imageFileName, char* outputFileName){
+void textFromImage(char *imageFileName) {
     FILE* weirdImage = fopen(imageFileName,"rb");
     ensureIsValidBMP(weirdImage);
     Dimensions dimensions = readDimensionsOfImage(weirdImage);
@@ -215,7 +218,7 @@ void textFromImage(char* imageFileName, char* outputFileName){
     free(rawImageData);
     String* string = pixelsToString((const pixel **) pixels, dimensions);
     free2DPixelArray(pixels,dimensions);
-    saveStringAsTextFile(string,outputFileName);
+    saveStringAsTextFile(string,"outputText.txt");
     destroyString(string);
 }
 
