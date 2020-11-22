@@ -25,7 +25,7 @@ void getMetaInfo(char *bmpImage);
  * @return
  * (new) image with the filter applied
  */
-newImage applyGrayscale(FILE *ofImage);
+void applyGrayscale(char *imageFileName);
 
 /**
  * Hides an image inside another image.
