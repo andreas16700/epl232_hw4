@@ -4,7 +4,8 @@
 
 #include "bmplib.h"
 #include <stdio.h>
-#include <ctype.h>
+#include <stdbool.h>
+
 static char* options[]={
          "-list"
         ,"-grayscale"
@@ -15,6 +16,11 @@ static char* options[]={
         ,"-stringToImage"
         ,"-imageToString"
 };
+
+int digittoint(char i);
+
+bool isnumber(char i);
+
 int getFunctionNumber(char* fromOption){
     for (int i = 0; i < sizeof(options); ++i)
         if (strcmp(fromOption,options[i])==0)
@@ -33,6 +39,11 @@ int toNumber(char* str){
     }while (*(++str)!='\0');
     return num;
 }
+
+int digittoint(char i) {
+    return i-'0';
+}
+
 int isNumber(char* str){
     do{
         if (!isnumber(*str))
@@ -40,6 +51,11 @@ int isNumber(char* str){
     }while (*(++str)!='\0');
     return 1;
 }
+
+bool isnumber(char i) {
+    return i>= '0' && i<= '9';
+}
+
 void choseOption(char* option, char*arguments[], int argumentCount){
     if (!isValidOption(option)){
         printf("\"%s\" is not a valid option!\n",option);
@@ -56,14 +72,14 @@ void choseOption(char* option, char*arguments[], int argumentCount){
                 applyGrayscale(arguments[i]);
             break;
         case 2:
-            if(!isdigit(*arguments[0]))
+            if(!isnumber(*arguments[0]))
                 exitWithMessage("Please specify a number of bits to use. (1-7)");
             if (argumentCount!=3)
                 exitWithMessage("Please specify the name of the shell image as well as the image to hide.");
             encodeImageWithinImage(arguments[1],arguments[2],digittoint(*arguments[0]));
             break;
         case 3:
-            if(!isdigit(*arguments[0]))
+            if(!isnumber(*arguments[0]))
                 exitWithMessage("Please specify a number of bits to use. (1-7)");
             if (argumentCount!=2)
                 exitWithMessage("Please specify the name of the image.");
