@@ -18,7 +18,7 @@ PUBLIC void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key
     char *text = readText(textToHide);
     byte *data = readImage(sourceImage);
 
-    unsigned long sizeOfImage = getLongFrom4Bytes(&data[34]);
+    int sizeOfImage = (signed)getLongFrom4Bytes(&data[34]);
 
     int *permutations = createPermutationFunction(sizeOfImage, key);
     for (int i = 0; i < strlen(text) * 8; i++) {
@@ -30,8 +30,8 @@ PUBLIC void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key
 }
 
 PRIVATE byte modifyBit(byte n, int p, int b) {
-    byte mask = 1 << p;
-    return (n & ~mask) | ((b << p) & mask);
+    byte mask = (unsigned)1 << (unsigned)p;
+    return (n & (unsigned)~mask) | (((unsigned)b << (unsigned)p) & mask);
 }
 
 PRIVATE char *readText(char *textToHide) {
@@ -42,7 +42,9 @@ PRIVATE char *readText(char *textToHide) {
     char *text = (char *) malloc(sizeof(char) * 10);
     ensureNotNull(text);
     int cntChar = 0;
-    while ((c = fgetc(fp)) != EOF) {
+    int signedByte;
+    while ((signedByte = fgetc(fp)) != EOF) {
+        c=(char)signedByte;
         if (cntChar + 1 >= sizeof(text)) {
             char *temp = (char *) realloc(text, (sizeof(char) * (cntChar * 2)));
             ensureNotNull(temp);
@@ -59,18 +61,18 @@ PRIVATE char *readText(char *textToHide) {
 PUBLIC void decodeTextFromImage(char *imageWithHiddenText, char *newFileName, int key, int length) {
     byte *imageData = readImage(imageWithHiddenText);
 
-    unsigned long sizeOfImage = getLongFrom4Bytes(&imageData[34]);
+    int sizeOfImage = (signed) getLongFrom4Bytes(&imageData[34]);
 
     int *permutations = createPermutationFunction(sizeOfImage, key);
     char *decodedText = (char *) malloc(sizeof(char) * (length + 1));
     ensureNotNull(decodedText);
-    int bitCnt = 7;
+    unsigned int bitCnt = 7;
     int charCounter = 0;
     byte charTemp = 0;
     for (int i = 0; i < length * 8; i++) {
         int posOfByte = permutations[i];
-        int bit = imageData[posOfByte + 54] & 0x1;
-        bit = bit << bitCnt;
+        byte bit = imageData[posOfByte + 54] & (unsigned) 0x1;
+        bit <<= bitCnt;
         charTemp = charTemp | bit;
         bitCnt--;
         if (bitCnt < 0) {
@@ -87,16 +89,16 @@ PUBLIC void decodeTextFromImage(char *imageWithHiddenText, char *newFileName, in
 PRIVATE int getBit(char *m, int n) {
     if (n < 0 || n > 8 * strlen(m))
         return 0;
-    int byt = m[n / 8];
-    int posInByte = 7 - (n % 8);
-    int found = byt & (1 << posInByte);
+    byte byt = m[n / 8];
+    byte posInByte = 7 - (n % 8);
+    byte found = byt & ((unsigned) 1 << posInByte);
     if (found > 0)
         return 1;
     return 0;
 }
 
 PRIVATE int *createPermutationFunction(int N, int key) {
-    srand(key);
+    srand48(key);
     //creates array of permutations
     int *perm = (int *) malloc(N * sizeof(int));
     ensureNotNull(perm);
@@ -106,8 +108,8 @@ PRIVATE int *createPermutationFunction(int N, int key) {
     }
     //randomly changes order
     for (int i = 0; i < N; i++) {
-        int val1 = rand() % N;
-        int val2 = rand() % N;
+        int val1 = (int)(lrand48() % N);
+        int val2 = (int)(lrand48() % N);
         int temp = perm[val1];
         perm[val1] = perm[val2];
         perm[val2] = temp;
