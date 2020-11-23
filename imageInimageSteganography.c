@@ -22,11 +22,11 @@ PRIVATE byte mergeBytes(byte importantByte, byte lessImportantByte, int bitsToUs
     //mask now is 8 consecutive ones
     byte upperMask = mask >> (byte) bitsToUse;
     upperMask <<= (byte) bitsToUse;
-    byte lowerMask = ~upperMask;
+
+    byte upperPart = upperMask & importantByte;
+    byte lowerPart = lessImportantByte>>((unsigned)8-bitsToUse);
 
     byte result = (byte) 0;
-    byte upperPart = upperMask & importantByte;
-    byte lowerPart = lowerMask & lessImportantByte;
     result |= upperPart;
     result |= lowerPart;
     return result;
