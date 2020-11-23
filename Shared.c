@@ -48,8 +48,57 @@ void ensureIsValidBMP(FILE *image) {
     }
 
 }
+int containsPath(const char* filename){
+    char c;
+    while((c=*(filename++))!='\0')
+        if (c=='/' || c=='\\')
+            return 1;
+    return 0;
+}
+int indexOfFirstCharOfFileNameWithoutPath(const char* path){
+    int lastIndex=(int)strlen(path)-1;
+    for (; lastIndex>=0; --lastIndex)
+        if (path[lastIndex]=='/' || path[lastIndex]=='\\')
+            return lastIndex+1;
+    return 0;
+}
+char* prefixSubstring(const char* current, int prefixLength){
+    char* prefix = malloc(prefixLength+1);
+    ensureNotNull(prefix);
+    for (int i = 0; i < prefixLength; ++i)
+        prefix[i]=current[i];
+    prefix[prefixLength]='\0';
+    return prefix;
+}
+char* postfixSubstring(const char* current, int postfixLength){
+    char* postfix = malloc(postfixLength+1);
+    int currentLength = (int) strlen(current);
+    ensureNotNull(postfix);
+    for (int i = 0; i < postfixLength; ++i)
+        postfix[i]=current[currentLength-postfixLength+i];
+    postfix[postfixLength]='\0';
+    return postfix;
+}
+char* addPrefixAfterPath(const char *current, const char *prefix){
+    int currentLength = (int)strlen(current);
+    int fileNameStartIndex = indexOfFirstCharOfFileNameWithoutPath(current);
+    int pathSize = fileNameStartIndex;
+    int fileNameLength=currentLength-pathSize;
+    char* path = prefixSubstring(current,pathSize);
+    char* fileName = postfixSubstring(current,fileNameLength);
 
+    char* newNameWithPath = calloc(currentLength+strlen(prefix)+1,sizeof(char));
+    ensureNotNull(newNameWithPath);
+    strcpy(newNameWithPath,path);
+    strcat(newNameWithPath,prefix);
+    strcat(newNameWithPath,fileName);
+    free(path);
+    free(fileName);
+    return newNameWithPath;
+}
 char *addPrefix(const char *current, const char *prefix) {
+    if (containsPath(current))
+        return addPrefixAfterPath(current,prefix);
     int newSize = (int) strlen(current) + (int) strlen(prefix);
     char *newName = (char *) malloc(newSize + 1);
     ensureNotNull(newName);
