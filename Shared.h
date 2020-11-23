@@ -47,9 +47,9 @@ unsigned int getLongFrom4Bytes(const byte *b);
 unsigned int getLongFrom2Bytes(const byte *b);
 
 /**
- * Creates a new image from thr bivn array of bytes.
+ * Creates a new image from the given array of bytes.
  * creates a new file with the given name
- * and moved the data from the given array to the file
+ * and moves the data from the given array to the file
  * @param
  * data array of bytes
  * @param
@@ -57,6 +57,16 @@ unsigned int getLongFrom2Bytes(const byte *b);
  */
 void createNewImageFile(char *nameOfNewImage, byte *data);
 
+/**
+ * Creates a new text file from and puts the given text in it.
+ * creates a new file with the given name
+ * @param nameOfNewTextFile
+ * the name of the new text file
+ * @param text
+ * teh text to be printed in the file
+ * @param length
+ * the length of the text
+ */
 void createNewTextFile(char *nameOfNewTextFile, char *text, int length);
 
 typedef struct DIMENSIONS {
