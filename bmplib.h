@@ -19,10 +19,8 @@ void getMetaInfo(char *bmpImage);
 
 /**
  * Applies the grayscale filter to a bitmap image to a new image file
- * @param ofImage
- * source image
- * @return
- * (new) image with the filter applied
+ * @param imageFileName
+ * file name of source image
  */
 void applyGrayscale(char *imageFileName);
 
@@ -56,16 +54,12 @@ void decodeHiddenImageFromEncodedImage(const char *fileNameOfImageWithHiddenImag
 
 /**
  * Hide some text inside an image
- * @param sourceImage
- * image to hide the text in
- * @param textToHide
- * the text to hide
- * @param sourceImageName
- * the name of the file that contains the image
+ * @param sourceImageFileName
+ * image name to hide text into
+ * @param textToHideFileName
+ * file name of text to be hidden
  * @param key
  * the systemkey that is going to be used t encrypt the text
- * @return
- * resulting new image
  */
 void encodeTextInsideAnImage(char *sourceImageFileName, char *textToHideFileName, int key);
 
@@ -73,7 +67,7 @@ void encodeTextInsideAnImage(char *sourceImageFileName, char *textToHideFileName
  * Find hidden text inside an image.
  * Has the opposite effect of encodeTextInsideAnImage().
  * @param imageWithHiddenText
- * image that text was hidden into
+ * file name of image with hidden text
  * @param newFileName
  * name of new file that decoded text will be printed in
  * @param key
@@ -81,7 +75,7 @@ void encodeTextInsideAnImage(char *sourceImageFileName, char *textToHideFileName
  * @param length
  * length of text to be decoded
  */
-PUBLIC void decodeTextFromImage(char *imageWithHiddenText, char *newFileName, int key, int length);
+void decodeTextFromImage(char *imageWithHiddenText, char *newFileName, int key, int length);
 
 /**
  * Save an image as seemingly nonsense image.

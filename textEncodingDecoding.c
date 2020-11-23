@@ -6,13 +6,18 @@
 #include <stdlib.h>
 #include "Shared.h"
 
+//reads the text file from the given file name and returns a string
 PRIVATE char *readText(char *textToHide);
 
+//gets the bit at a position in a string
 PRIVATE int getBit(char *m, int n);
 
+//creates a permutation array with N size and srand key key
 PRIVATE int *createPermutationFunction(int N, int key);
 
+//modifies the bit at pos p to b in given byte
 PRIVATE byte modifyBit(byte n, int p, int b);
+
 
 PUBLIC void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key) {
     char *text = readText(textToHide);
@@ -24,7 +29,9 @@ PUBLIC void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key
     int *permutations = createPermutationFunction(sizeOfImage, key);
     for (int i = 0; i < textLength * 8; i++) {
         int bit = getBit(text, i);
+        //gets the position of the byte that the bit is going to be encoded in
         int posOfByte = permutations[i];
+        //encodes bit
         data[54 + posOfByte] = modifyBit(data[54 + posOfByte], 0, bit);
     }
     createNewImageFile(addPrefix(sourceImage, "new-"), data);
@@ -65,19 +72,27 @@ PUBLIC void decodeTextFromImage(char *imageWithHiddenText, char *newFileName, in
     int sizeOfImage = (signed) getLongFrom4Bytes(&imageData[34]);
 
     int *permutations = createPermutationFunction(sizeOfImage, key);
+
     char *decodedText = (char *) malloc(sizeof(char) * (length + 1));
     ensureNotNull(decodedText);
     unsigned int bitCnt = 7;
     int charCounter = 0;
     byte charTemp = 0;
+
     for (int i = 0; i < length * 8; i++) {
+        //gets position of specific byte in which i bit was saved in
         int posOfByte = permutations[i];
+        //gets the bit from the byte
         byte bit = imageData[posOfByte + 54] & (unsigned) 0x1;
-        bit <<= bitCnt;
+        //bit shifted to position
+        bit = bit << bitCnt;
         charTemp = charTemp | bit;
 
+        //byte is fully read
+        //moving to next byte
         if (bitCnt == 0) {
             bitCnt = 7;
+            //saving byte in array
             decodedText[charCounter] = charTemp;
             charCounter++;
             charTemp = 0;
@@ -86,6 +101,7 @@ PUBLIC void decodeTextFromImage(char *imageWithHiddenText, char *newFileName, in
         }
     }
     decodedText[length] = '\0';
+    //creates text file from decoded string
     createNewTextFile(newFileName, decodedText, length);
 }
 
