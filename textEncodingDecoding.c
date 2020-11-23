@@ -33,7 +33,10 @@ PUBLIC void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key
         //encodes bit
         data[54 + posOfByte] = modifyBit(data[54 + posOfByte], 0, bit);
     }
+    free(permutations);
     createNewImageFile(addPrefix(sourceImage, "new-"), data);
+    free(text);
+    free(data);
 }
 
 PRIVATE byte modifyBit(byte n, int p, int b) {
@@ -43,7 +46,7 @@ PRIVATE byte modifyBit(byte n, int p, int b) {
 
 PRIVATE char *readText(char *textToHide) {
     FILE *fp = fopen(textToHide, "r");
-    ensureNotNull(fp);
+    ensureFileExists(fp, textToHide);
     char c;
     //creating array chars
     char *text = (char *) malloc(sizeof(char) * 10);
@@ -95,9 +98,11 @@ PUBLIC void decodeTextFromImage(char *imageWithHiddenText, char *newFileName, in
             charTemp = 0;
         }
     }
+    free(permutations);
     decodedText[length] = '\0';
     //creates text file from decoded string
     createNewTextFile(newFileName, decodedText, length);
+    free(decodedText);
 }
 
 PRIVATE int getBit(char *m, int n) {
