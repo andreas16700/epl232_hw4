@@ -17,11 +17,12 @@ PRIVATE byte modifyBit(byte n, int p, int b);
 PUBLIC void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key) {
     char *text = readText(textToHide);
     byte *data = readImage(sourceImage);
-
+    int textLength = (int)strlen(text);
+    printf("Length: %d\n",textLength);
     int sizeOfImage = (signed)getLongFrom4Bytes(&data[34]);
 
     int *permutations = createPermutationFunction(sizeOfImage, key);
-    for (int i = 0; i < strlen(text) * 8; i++) {
+    for (int i = 0; i < textLength * 8; i++) {
         int bit = getBit(text, i);
         int posOfByte = permutations[i];
         data[54 + posOfByte] = modifyBit(data[54 + posOfByte], 0, bit);
@@ -74,12 +75,14 @@ PUBLIC void decodeTextFromImage(char *imageWithHiddenText, char *newFileName, in
         byte bit = imageData[posOfByte + 54] & (unsigned) 0x1;
         bit <<= bitCnt;
         charTemp = charTemp | bit;
-        bitCnt--;
-        if (bitCnt < 0) {
+
+        if (bitCnt == 0) {
             bitCnt = 7;
             decodedText[charCounter] = charTemp;
             charCounter++;
             charTemp = 0;
+        }else{
+            bitCnt--;
         }
     }
     decodedText[length] = '\0';
