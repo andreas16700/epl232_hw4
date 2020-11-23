@@ -4,6 +4,9 @@
 
 #ifndef SHARED_MYSTRING_H
 #define SHARED_MYSTRING_H
+#ifndef __unused
+#define __unused        __attribute__((__unused__))
+#endif
 
 typedef struct {
     int capacity;
