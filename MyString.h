@@ -15,11 +15,15 @@ String* newStringFromCharArray(const char* array);
 String* newStringWithCapacity(int capacity);
 void addChar(String *string, char thing);
 void destroyString(String* string);
-void addString(String* destination, const String* new);
-void debugPrint(String* string);
-void makeEmpty(String* string);
+
+__unused void addString(String* destination, const String* new);
+
+__unused void debugPrint(String* string);
+
+__unused void makeEmpty(String* string);
 void addStrCharArray(String* string, const char* arr);
-void trim(String* string);
+
+__unused void trim(String* string);
 String* readTextFile(const char* filename);
 void saveStringAsTextFile(String* string, char* fileName);
 #endif //SHARED_MYSTRING_H

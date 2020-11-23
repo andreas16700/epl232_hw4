@@ -5,10 +5,7 @@
 #include "bmplib.h"
 #include <ctype.h>
 
-byte getBit(String* text
-            ,int row, int col
-            , int height, int width){
-
+byte getBit(String *text, int row, int col, int height) {
     int totalBitIndex = col*height+row;
     int charIndex = totalBitIndex/8;
     int bitIndex = totalBitIndex%8;
@@ -24,11 +21,6 @@ byte getBit(String* text
 byte bitToPixel(byte bitFromText){
     return 128*bitFromText;
 }
-void writePixel(byte* rgb, FILE* image){
-    for (int i = 0; i < 3; ++i)
-        fputc(rgb[i],image);
-
-}
 
 void convertAndWriteTextAsImageData(String* text, FILE* image, Dimensions imageDimensions){
     int height = imageDimensions.biHeight;
@@ -38,7 +30,7 @@ void convertAndWriteTextAsImageData(String* text, FILE* image, Dimensions imageD
     for (int row = 0; row <imageDimensions.biHeight ; row++) {
         for (int col = 0; col < width; ++col) {
 
-            byte bit = getBit(text, row, col, height, width);
+            byte bit = getBit(text, row, col, height);
             byte valueToWrite = bit*128;
             for (int i = 0; i < 3; ++i)
                 fputc(valueToWrite,image);
@@ -108,7 +100,8 @@ static void printchar(unsigned char theChar) {
             break;
     }
 }
-void printCharsInPixelArray(pixel** pixels, Dimensions dimensions){
+
+__unused void printCharsInPixelArray(pixel** pixels, Dimensions dimensions){
     char** char2d = malloc(dimensions.biHeight*sizeof(char*));
     for (int i = 0; i < dimensions.biHeight; ++i)
         char2d[i]=malloc(dimensions.biWidth*sizeof(char));
@@ -150,7 +143,8 @@ void printCharsInPixelArray(pixel** pixels, Dimensions dimensions){
     }
 
 }
-void printPixelArray(pixel** pixels, Dimensions dimensions){
+
+__unused void printPixelArray(pixel** pixels, Dimensions dimensions){
     printf("\t");
     for (int c = 0; c < dimensions.biWidth; ++c)
         printf("%4d",c);

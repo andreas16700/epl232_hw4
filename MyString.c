@@ -25,7 +25,7 @@ String* newString(){
     return newStringWithCapacity(STARTING_CAPACITY);
 }
 String* newStringFromCharArray(const char* array){
-    int capacity = strlen(array);
+    int capacity = (int) strlen(array);
     String* string = newStringWithCapacity(capacity+1);
     addStrCharArray(string,array);
     return string;
@@ -68,14 +68,16 @@ void ensureCapacityToAddString(String* destination, const String* new){
     int newCapacity = destination->currentCharCount+new->currentCharCount+1;
     ensureCapacity(destination,newCapacity);
 }
-void addString(String* destination, const String* new){
+
+__unused void addString(String* destination, const String* new){
     ensureCapacityToAddString(destination,new);
     char* newBase = new->startAddress;
     for (int i = 0; i < new->currentCharCount; ++i)
         addChar(destination,newBase[i]);
 
 }
-void debugPrint(String* string){
+
+__unused void debugPrint(String* string){
     printf("String \"%s\":\n",string->startAddress);
     printf("Capacity: %d\n",string->capacity);
     printf("%5c",'i');
@@ -92,16 +94,18 @@ void debugPrint(String* string){
     }
     printf("\n");
 }
-void makeEmpty(String* string){
+
+__unused void makeEmpty(String* string){
     string->currentCharCount=0;
     string->startAddress[0]='\0';
 }
 void addStrCharArray(String* string, const char* arr){
-    int capacity = strlen(arr);
+    int capacity = (int)strlen(arr);
     for (int i = 0; i < capacity; ++i)
         addChar(string,arr[i]);
 }
-void trim(String* string){
+
+__unused void trim(String* string){
     int trimmedCapacity=string->currentCharCount+1;
     char* newBase = realloc(string->startAddress,trimmedCapacity);
     ensureNotNull(newBase);

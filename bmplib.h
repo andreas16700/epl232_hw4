@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include "Shared.h"
 
-typedef struct IMAGERETURNTYPE *newImage;
 
 
 

@@ -3,10 +3,8 @@
 //
 
 #include <stdlib.h>
-#include <string.h>
 #include "bmplib.h"
 #include "Shared.h"
-#define DEBUG_MERGE 0
 //this file implements the following functions
 //newImage encodeImageWithinImage(FILE* shellImage, FILE* hiddenImage, int bitsToUse);
 //newImage decodeHiddenImageFromEncodedImage(FILE* encryptedImage, int bitsToUse);
@@ -40,13 +38,7 @@ PRIVATE byte extractHiddenImageByte(byte mergedByte, int bitsToUse){
     byte numberOfBitsToDisRegard = 8-bitsToUse;
     byte result = mergedByte<<numberOfBitsToDisRegard;
 
-    if (DEBUG_MERGE) {
-        printf("\nMerged byte:\t%d\t", mergedByte);
-        printf(BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(mergedByte));
-        printf("\nResult:\t%d\t", result);
-        printf(BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(result));
-        fflush(stdout);
-    }
+
     return result;
 }
 PRIVATE void extractImageData(FILE* srcImage, FILE* extracted, int bitsToUse){
@@ -115,13 +107,35 @@ PUBLIC void decodeHiddenImageFromEncodedImage(const char* fileNameOfImageWithHid
 #include <time.h>
 #include <assert.h>
 
+byte onlyMSBAsLSB(byte b, byte bitCount){
+    return b>>((unsigned)8-bitCount);
+}
+void testExtractHiddenImageByte(){
+    srand48(time(NULL));
+
+    byte shell = (unsigned)lrand48()&(unsigned)255;
+    printf("\nshell:\t%d\t", shell);
+    printf(BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(shell));
+    byte hidden = (unsigned)lrand48()&(unsigned)255;
+    printf("\nhidden:\t%d\t", shell);
+    printf(BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(hidden));
+    for (int i = 1; i < 8; ++i) {
+        byte merged = mergeBytes(shell,hidden,i);
+        printf("\nmerged:\t%d\t", merged);
+        printf(BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(merged));
+        byte extracted = extractHiddenImageByte(merged,i);
+        printf("\nextracted:\t%d\t", extracted);
+        printf(BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(extracted));
+        byte recovered = onlyMSBAsLSB(extracted,i);
+        assert((recovered&hidden)==recovered);
+    }
+
+}
+
 void testMergeByte(){
     srand48(time(NULL));
     byte b1 = (unsigned)lrand48()&(unsigned)255;
     byte b2 = (unsigned)lrand48()&(unsigned)255;
-    int bitsToUse = (signed)((unsigned) lrand48()&(unsigned)7);
-    int diff = 8-bitsToUse;
-//    byte lsb
 
     printf("Visual test:\n");
     printf("\t\t\t\t\t\tdec\tbinary\n");
@@ -140,5 +154,6 @@ void testMergeByte(){
 }
 int main(){
     testMergeByte();
+    testExtractHiddenImageByte();
 }
 #endif
