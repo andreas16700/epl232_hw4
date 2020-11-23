@@ -11,10 +11,33 @@ void ensureNotNull(void *pntr) {
         exit(-1);
     }
 }
-
-int isValidBMP(FILE *file) {
-    //TODO other checks here
-    return 1;
+byte* readHeader(FILE* file){
+    rewind(file);
+    byte* bytes = calloc(HEADER_BYTE_LENGTH,sizeof(byte));
+    ensureNotNull(bytes);
+    for (int i = 0; i < HEADER_BYTE_LENGTH; ++i) {
+        int token = fgetc(file);
+        if (token==EOF)
+            return NULL;
+        bytes[i]=(byte) token;
+    }
+    return bytes;
+}
+int isValidBMP(FILE* file) {
+    byte* header = readHeader(file);
+    rewind(file);
+    if (header==NULL)
+        return 0;
+    return
+    //image type must be bitmap
+    header[0]=='B' && header[1]=='M'
+    &&
+    //must be a 24bit image
+    getLongFrom2Bytes(&header[28])==24
+    &&
+    //must not be compressed
+    getLongFrom4Bytes(&header[30])==0
+    ;
 }
 
 void ensureIsValidBMP(FILE *image) {
@@ -69,9 +92,8 @@ Dimensions readDimensionsOfImage(FILE *image) {
     //skip file header
     int fileHeaderLength = 14, infoHeaderBytesToSkip = 4;
     int bytesToSkip = fileHeaderLength + infoHeaderBytesToSkip;
-    int dummy;
     for (int i = 0; i < bytesToSkip; ++i)
-        dummy = fgetc(image);
+        fgetc(image);
     byte *biWidth = malloc(4 * sizeof(byte));
     byte *biHeight = malloc(4 * sizeof(byte));
     for (int i = 0; i < 4; ++i)
@@ -160,7 +182,7 @@ void createNewTextFile(char *nameOfNewTextFile, char *text, int length) {
     }
     fclose(newText);
 }
-void ensureFileExists(FILE* file, char* filename){
+void ensureFileExists(FILE* file, const char* filename){
     if (file==NULL){
         printf("File \"%s\" could not be found!",filename);
         exitWithMessage("");

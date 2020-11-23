@@ -21,8 +21,8 @@
   (byte & (unsigned) 0x01 ? '1' : '0')
 #define HEADER_BYTE_LENGTH 54
 typedef unsigned char byte;
-typedef unsigned short int word;
-typedef unsigned int dword;
+__unused typedef unsigned short int word;
+__unused typedef unsigned int dword;
 
 void ensureIsValidBMP(FILE *image);
 
@@ -82,7 +82,7 @@ byte *readOnlyImageData(FILE *image);
 
 void exitWithMessage(const char *message);
 
-void ensureFileExists(FILE* file, char* filename);
+void ensureFileExists(FILE* file, const char* filename);
 void ensureFileOpenedForWriting(FILE* file, char* filename);
 
 #endif //BMPLIB_SHARED_H
