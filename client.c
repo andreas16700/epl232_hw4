@@ -5,7 +5,7 @@
 #include "bmplib.h"
 #include <stdio.h>
 #include <ctype.h>
-/*static char* options[]={
+static char* options[]={
          "-list"
         ,"-grayscale"
         ,"-encodeStegano"
@@ -95,19 +95,18 @@ void choseOption(char* option, char*arguments[], int argumentCount){
         default:
             exitWithMessage("Illegal option!");
     }
-}*/
+}
 #if !defined(IMAGE_STRING_DEBUG) \
     &&\
     !defined(ENCODEIMAGE_DEBUG)  \
     &&\
     !defined(DEBUG_TEXTENCODINGDECODING)
 int main(int argc, char *argv[]) {
-    /*for (int i = 0; i < argc; ++i)
+    for (int i = 0; i < argc; ++i)
         if (*argv[i]=='-') {
             choseOption(argv[i], argv + i + 1, argc - (i + 1));
             return 0;
         }
-    printf("Please specify an option and arguments!\n(e.g. ./bmpSteganography -imageToString image.bmp)\n");*/
-    getMetaInfo("image1.bmp");
+    printf("Please specify an option and arguments!\n(e.g. ./bmpSteganography -imageToString image.bmp)\n");
 }
 #endif
