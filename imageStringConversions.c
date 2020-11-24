@@ -19,9 +19,6 @@ PRIVATE byte getBit(String *text, int row, int col, int height) {
     character&=(unsigned)1;
     return character;
 }
-PRIVATE byte bitToPixel(byte bitFromText){
-    return 128*bitFromText;
-}
 
 PRIVATE void convertAndWriteTextAsImageData(String* text, FILE* image, Dimensions imageDimensions){
     int height = imageDimensions.biHeight;
@@ -260,7 +257,7 @@ void testGetBit(){
     for (int row = height-1; row >= 0 ; row--) {
         for (int col = 0; col < width; ++col) {
             byte bit = getBit(str, row, col, height);
-            byte byteToWrite = bitToPixel(bit);
+            byte byteToWrite = bit*128;
             printf("would write ");
             printf(BYTE_TO_BINARY_PATTERN,BYTE_TO_BINARY(byteToWrite));
             printf(" from row=%d,col=%d\n",row,col);
