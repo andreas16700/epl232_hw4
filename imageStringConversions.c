@@ -58,6 +58,7 @@ PUBLIC void saveTextAsImage(const char *textFileName, const char *sampleImageNam
     copyHeader(sample,output);
     convertAndWriteTextAsImageData(text,output,readDimensionsOfImage(sample));
     printf("Saved image as \"%s\"\n",outputFileName);
+    free(outputFileName);
     destroyString(text);
     fflush(output);
     fclose(output);

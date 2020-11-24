@@ -16,8 +16,10 @@ PUBLIC void applyGrayscale(char *imageFileName) {
         data[i + 1] = grayValue;
         data[i + 2] = grayValue;
     }
-    createNewImageFile(addPrefix(imageFileName, "gray-"), data);
+    char* newName = addPrefix(imageFileName, "gray-");
+    createNewImageFile(newName, data);
     free(data);
+    free(newName);
 }
 
 PRIVATE int getGray(byte red, byte green, byte blue) {

@@ -85,6 +85,7 @@ PUBLIC void encodeImageWithinImage(const char *shellImageName,const char *hidden
     copyHeader(shellImage,output);
     writeMergedImageData(shellImage,hiddenImage,output,bitsToUse);
     printf("Saved new image as \"%s\"\n",newName);
+    free(newName);
     doneWithFile(shellImage);
     doneWithFile(hiddenImage);
     doneWithFile(output);
@@ -99,6 +100,7 @@ PUBLIC void decodeHiddenImageFromEncodedImage(const char* fileNameOfImageWithHid
     copyHeader(imageWithHiddenImage,extractedImage);
     extractImageData(imageWithHiddenImage,extractedImage,bitsToUse);
     printf("Saved extracted image as\"%s\"\n",newName);
+    free(newName);
     doneWithFile(imageWithHiddenImage);
     doneWithFile(extractedImage);
 }
