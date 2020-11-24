@@ -1,6 +1,7 @@
 //
 // Created by Sohaib on 18/11/2020.
 //
+#define _XOPEN_SOURCE
 #include "bmplib.h"
 #include <string.h>
 #include <stdlib.h>
