@@ -23,8 +23,9 @@ PRIVATE byte modifyBit(byte n, int p, int b);
 PUBLIC void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key) {
     char *text = readText(textToHide);
     byte *data = readImage(sourceImage);
-    int textLength = (int)strlen(text);
-    printf("Length: %d\n",textLength);
+    //plus one for the null character
+    int textLength = (int)strlen(text)+1;
+    printf("Encoding text of length %d.\n",textLength);
     int sizeOfImage = (signed)getLongFrom4Bytes(&data[34]);
 
     int *permutations = createPermutationFunction(sizeOfImage, key);
@@ -36,7 +37,10 @@ PUBLIC void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key
         data[54 + posOfByte] = modifyBit(data[54 + posOfByte], 0, bit);
     }
     free(permutations);
-    createNewImageFile(addPrefix(sourceImage, "new-"), data);
+    char* newName = addPrefix(sourceImage, "new-");
+    createNewImageFile(newName, data);
+    printf("Saved new image as \"%s\".\n",newName);
+    free(newName);
     free(text);
     free(data);
 }
@@ -108,6 +112,7 @@ PUBLIC void decodeTextFromImage(char *imageWithHiddenText, char *newFileName, in
     decodedText[length] = '\0';
     //creates text file from decoded string
     createNewTextFile(newFileName, decodedText, length);
+    printf("Saved decoded text in \"%s\".\n",newFileName);
     free(decodedText);
 }
 
