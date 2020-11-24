@@ -29,4 +29,5 @@ PUBLIC void getMetaInfo(char *bmpImage) {
     printf("biClrUsed: %u\n", getLongFrom4Bytes(&data[46]));
     printf("biClrImportant: %u\n", getLongFrom4Bytes(&data[50]));
     printf("\n***************************************************************************\n");
+    free(data);
 }
