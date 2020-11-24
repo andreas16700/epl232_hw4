@@ -156,6 +156,8 @@ PUBLIC Dimensions readDimensionsOfImage(FILE *image) {
     for (int i = 0; i < 4; ++i)
         biHeight[i] = fgetc(image);
     Dimensions dimensions = {.biHeight=intFromNBytes(biHeight, 4), .biWidth=intFromNBytes(biWidth, 4)};
+    free(biHeight);
+    free(biWidth);
     return dimensions;
 }
 

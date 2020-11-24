@@ -114,6 +114,7 @@ PUBLIC void decodeTextFromImage(char *imageWithHiddenText, char *newFileName, in
     createNewTextFile(newFileName, decodedText, length);
     printf("Saved decoded text in \"%s\".\n",newFileName);
     free(decodedText);
+    free(imageData);
 }
 
 PRIVATE int getBit(char *m, int n) {

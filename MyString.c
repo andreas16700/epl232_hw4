@@ -125,6 +125,7 @@ PUBLIC String* readTextFile(const char* filename){
         addStrCharArray(fileContents,newLine);
         newLine[0]='\0';
     }
+    fclose(textFile);
     free(newLine);
     return fileContents;
 }
