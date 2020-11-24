@@ -24,21 +24,26 @@ PRIVATE byte* readHeader(FILE* file){
     }
     return bytes;
 }
+PRIVATE int headerIsOfValidBMPImage(byte* header){
+    return
+        //image type must be bitmap
+            header[0]=='B' && header[1]=='M'
+            &&
+            //must be a 24bit image
+            getLongFrom2Bytes(&header[28])==24
+            &&
+            //must not be compressed
+            getLongFrom4Bytes(&header[30])==0
+            ;
+}
 PUBLIC int isValidBMP(FILE* file) {
     byte* header = readHeader(file);
     rewind(file);
     if (header==NULL)
         return 0;
-    return
-    //image type must be bitmap
-    header[0]=='B' && header[1]=='M'
-    &&
-    //must be a 24bit image
-    getLongFrom2Bytes(&header[28])==24
-    &&
-    //must not be compressed
-    getLongFrom4Bytes(&header[30])==0
-    ;
+    int isValid = headerIsOfValidBMPImage(header);
+    free(header);
+    return isValid;
 }
 
 PUBLIC void ensureIsValidBMP(FILE *image) {
