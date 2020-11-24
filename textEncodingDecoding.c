@@ -56,13 +56,15 @@ PRIVATE char *readText(char *textToHide) {
     char c;
     //creating array chars
     char *text = (char *) malloc(sizeof(char) * 10);
+    int sizeOfText=10;
     ensureNotNull(text);
     int cntChar = 0;
     int signedByte;
     while ((signedByte = fgetc(fp)) != EOF) {
         c=(char)signedByte;
-        if (cntChar + 1 >= sizeof(text)) {
+        if (cntChar + 1 >= sizeOfText) {
             char *temp = (char *) realloc(text, (sizeof(char) * (cntChar * 2)));
+            sizeOfText = 2 * cntChar;
             ensureNotNull(temp);
             text = temp;
         }
