@@ -184,7 +184,7 @@ byte *readOnlyImageData(FILE *image) {
 
 byte *readImage(char *imageFile) {
     FILE *fp = fopen(imageFile, "rb");
-    ensureNotNull(fp);
+    ensureFileExists(fp, imageFile);
     byte b;
     int readByte;
     int index = 0;
@@ -216,7 +216,7 @@ void exitWithMessage(const char *message) {
 void createNewImageFile(char *nameOfNewImage, byte *data) {
     unsigned long sizeOfImage = getLongFrom4Bytes(&data[34]);
     FILE *newImage = fopen(nameOfNewImage, "wb");
-    ensureNotNull(newImage);
+    ensureFileOpenedForWriting(newImage, nameOfNewImage);
     for (int i = 0; i < sizeOfImage + 54; i++) {
         fputc(data[i], newImage);
     }
@@ -225,7 +225,7 @@ void createNewImageFile(char *nameOfNewImage, byte *data) {
 
 void createNewTextFile(char *nameOfNewTextFile, char *text, int length) {
     FILE *newText = fopen(nameOfNewTextFile, "w");
-    ensureNotNull(newText);
+    ensureFileOpenedForWriting(newText, nameOfNewTextFile);
     for (int i = 0; i < length; i++) {
         fputc(text[i], newText);
     }
