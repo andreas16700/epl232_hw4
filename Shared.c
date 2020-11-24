@@ -4,14 +4,15 @@
 
 #include <stdlib.h>
 #include "Shared.h"
+#include "bmplib.h"
 
-void ensureNotNull(void *pntr) {
+PUBLIC void ensureNotNull(void *pntr) {
     if (pntr == NULL) {
         printf("Null pointer!\n");
         exit(-1);
     }
 }
-byte* readHeader(FILE* file){
+PRIVATE byte* readHeader(FILE* file){
     rewind(file);
     byte* bytes = calloc(HEADER_BYTE_LENGTH,sizeof(byte));
     ensureNotNull(bytes);
@@ -23,7 +24,7 @@ byte* readHeader(FILE* file){
     }
     return bytes;
 }
-int isValidBMP(FILE* file) {
+PUBLIC int isValidBMP(FILE* file) {
     byte* header = readHeader(file);
     rewind(file);
     if (header==NULL)
@@ -40,7 +41,7 @@ int isValidBMP(FILE* file) {
     ;
 }
 
-void ensureIsValidBMP(FILE *image) {
+PUBLIC void ensureIsValidBMP(FILE *image) {
     ensureNotNull(image);
     if (!isValidBMP(image)) {
         printf("File is not a BMP image.\n");
@@ -48,21 +49,21 @@ void ensureIsValidBMP(FILE *image) {
     }
 
 }
-int containsPath(const char* filename){
+PUBLIC int containsPath(const char* filename){
     char c;
     while((c=*(filename++))!='\0')
         if (c=='/' || c=='\\')
             return 1;
     return 0;
 }
-int indexOfFirstCharOfFileNameWithoutPath(const char* path){
+PRIVATE int indexOfFirstCharOfFileNameWithoutPath(const char* path){
     int lastIndex=(int)strlen(path)-1;
     for (; lastIndex>=0; --lastIndex)
         if (path[lastIndex]=='/' || path[lastIndex]=='\\')
             return lastIndex+1;
     return 0;
 }
-char* prefixSubstring(const char* current, int prefixLength){
+PRIVATE char* prefixSubstring(const char* current, int prefixLength){
     char* prefix = malloc(prefixLength+1);
     ensureNotNull(prefix);
     for (int i = 0; i < prefixLength; ++i)
@@ -70,7 +71,7 @@ char* prefixSubstring(const char* current, int prefixLength){
     prefix[prefixLength]='\0';
     return prefix;
 }
-char* postfixSubstring(const char* current, int postfixLength){
+PRIVATE char* postfixSubstring(const char* current, int postfixLength){
     char* postfix = malloc(postfixLength+1);
     int currentLength = (int) strlen(current);
     ensureNotNull(postfix);
@@ -79,7 +80,7 @@ char* postfixSubstring(const char* current, int postfixLength){
     postfix[postfixLength]='\0';
     return postfix;
 }
-char* addPrefixAfterPath(const char *current, const char *prefix){
+PRIVATE char* addPrefixAfterPath(const char *current, const char *prefix){
     int currentLength = (int)strlen(current);
     int fileNameStartIndex = indexOfFirstCharOfFileNameWithoutPath(current);
     int pathSize = fileNameStartIndex;
@@ -96,7 +97,7 @@ char* addPrefixAfterPath(const char *current, const char *prefix){
     free(fileName);
     return newNameWithPath;
 }
-char *addPrefix(const char *current, const char *prefix) {
+PUBLIC char *addPrefix(const char *current, const char *prefix) {
     if (containsPath(current))
         return addPrefixAfterPath(current,prefix);
     int newSize = (int) strlen(current) + (int) strlen(prefix);
@@ -110,7 +111,7 @@ char *addPrefix(const char *current, const char *prefix) {
     return newName;
 }
 
-int intFromNBytes(const byte *bytes, int n) {
+PUBLIC int intFromNBytes(const byte *bytes, int n) {
     unsigned int num = 0;
     for (int i = n - 1; i >= 0; --i) {
         num <<= (unsigned) 8;
@@ -119,15 +120,15 @@ int intFromNBytes(const byte *bytes, int n) {
     return (signed) num;
 }
 
-unsigned int getLongFrom4Bytes(const byte *b) {
+PUBLIC unsigned int getLongFrom4Bytes(const byte *b) {
     return (unsigned) intFromNBytes(b, 4);
 }
 
-unsigned int getLongFrom2Bytes(const byte *b) {
+PUBLIC unsigned int getLongFrom2Bytes(const byte *b) {
     return (unsigned) intFromNBytes(b, 2);
 }
 
-void copyHeader(FILE *from, FILE *to) {
+PUBLIC void copyHeader(FILE *from, FILE *to) {
     rewind(from);
     rewind(to);
     for (int i = 0; i < HEADER_BYTE_LENGTH; ++i) {
@@ -136,7 +137,7 @@ void copyHeader(FILE *from, FILE *to) {
     }
 }
 
-Dimensions readDimensionsOfImage(FILE *image) {
+PUBLIC Dimensions readDimensionsOfImage(FILE *image) {
     rewind(image);
     //skip file header
     int fileHeaderLength = 14, infoHeaderBytesToSkip = 4;
@@ -153,7 +154,7 @@ Dimensions readDimensionsOfImage(FILE *image) {
     return dimensions;
 }
 
-byte *readOnlyImageData(FILE *image) {
+PUBLIC byte *readOnlyImageData(FILE *image) {
     rewind(image);
     for (int i = 0; i < HEADER_BYTE_LENGTH; ++i)
         fgetc(image);
@@ -182,7 +183,7 @@ byte *readOnlyImageData(FILE *image) {
     return data;
 }
 
-byte *readImage(char *imageFile) {
+PUBLIC byte *readImage(char *imageFile) {
     FILE *fp = fopen(imageFile, "rb");
     ensureFileExists(fp, imageFile);
     byte b;
@@ -208,12 +209,12 @@ byte *readImage(char *imageFile) {
     return data;
 }
 
-void exitWithMessage(const char *message) {
+PUBLIC void exitWithMessage(const char *message) {
     printf("%s\n", message);
     exit(-1);
 }
 
-void createNewImageFile(char *nameOfNewImage, byte *data) {
+PUBLIC void createNewImageFile(char *nameOfNewImage, byte *data) {
     unsigned long sizeOfImage = getLongFrom4Bytes(&data[34]);
     FILE *newImage = fopen(nameOfNewImage, "wb");
     ensureFileOpenedForWriting(newImage, nameOfNewImage);
@@ -223,7 +224,7 @@ void createNewImageFile(char *nameOfNewImage, byte *data) {
     fclose(newImage);
 }
 
-void createNewTextFile(char *nameOfNewTextFile, char *text, int length) {
+PUBLIC void createNewTextFile(char *nameOfNewTextFile, char *text, int length) {
     FILE *newText = fopen(nameOfNewTextFile, "w");
     ensureFileOpenedForWriting(newText, nameOfNewTextFile);
     for (int i = 0; i < length; i++) {
@@ -231,13 +232,13 @@ void createNewTextFile(char *nameOfNewTextFile, char *text, int length) {
     }
     fclose(newText);
 }
-void ensureFileExists(FILE* file, const char* filename){
+PUBLIC void ensureFileExists(FILE* file, const char* filename){
     if (file==NULL){
         printf("File \"%s\" could not be found!",filename);
         exitWithMessage("");
     }
 }
-void ensureFileOpenedForWriting(FILE* file, char* filename){
+PUBLIC void ensureFileOpenedForWriting(FILE* file, char* filename){
     if (file==NULL){
         printf("File \"%s\" could not be opened for writing!",filename);
         exitWithMessage("");

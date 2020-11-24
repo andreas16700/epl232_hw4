@@ -7,10 +7,12 @@
 #include <string.h>
 #include "MyString.h"
 #include "Shared.h"
+#include "bmplib.h"
+
 #define STARTING_CAPACITY 4
 #define READ_FROMFILE_LINE_CAPACITY 25
 
-String* newStringWithCapacity(int capacity){
+PUBLIC String* newStringWithCapacity(int capacity){
     String* new = malloc(sizeof(String));
     new->currentCharCount=0;
     ensureNotNull(new);
@@ -21,55 +23,55 @@ String* newStringWithCapacity(int capacity){
     new->startAddress[new->currentCharCount]='\0';
     return new;
 }
-String* newString(){
+PUBLIC String* newString(){
     return newStringWithCapacity(STARTING_CAPACITY);
 }
-String* newStringFromCharArray(const char* array){
+PUBLIC String* newStringFromCharArray(const char* array){
     int capacity = (int) strlen(array);
     String* string = newStringWithCapacity(capacity+1);
     addStrCharArray(string,array);
     return string;
 }
 
-void setNewStartAddress(String* string, char* newStart){
+PRIVATE void setNewStartAddress(String* string, char* newStart){
     string->startAddress=newStart;
 }
-void makeBigger(String *string){
+PRIVATE void makeBigger(String *string){
     string->capacity*=2;
     char* new;
     new = realloc(string->startAddress,string->capacity);
     ensureNotNull(new);
     setNewStartAddress(string, new);
 }
-void ensureCapacity(String* string, int forNewCharCount){
+PRIVATE void ensureCapacity(String* string, int forNewCharCount){
     while(forNewCharCount+1>=string->capacity)
         makeBigger(string);
 
 }
-void ensureEnoughCapacityForNextCharAndNull(String *forString){
+PRIVATE void ensureEnoughCapacityForNextCharAndNull(String *forString){
     if (forString->currentCharCount+1>=forString->capacity)
         makeBigger(forString);
 }
-char* nextAddress(String *ofString){
+PRIVATE char* nextAddress(String *ofString){
     ensureEnoughCapacityForNextCharAndNull(ofString);
     return &ofString->startAddress[ofString->currentCharCount];
 }
-void addChar(String *string, char thing){
+PUBLIC void addChar(String *string, char thing){
     char *next = nextAddress(string);
     *next=thing;
     *(next+1)='\0';
     string->currentCharCount++;
 }
-void destroyString(String* string){
+PUBLIC void destroyString(String* string){
     free(string->startAddress);
     free(string);
 }
-void ensureCapacityToAddString(String* destination, const String* new){
+PRIVATE void ensureCapacityToAddString(String* destination, const String* new){
     int newCapacity = destination->currentCharCount+new->currentCharCount+1;
     ensureCapacity(destination,newCapacity);
 }
 
-__unused void addString(String* destination, const String* new){
+__unused PUBLIC void addString(String* destination, const String* new){
     ensureCapacityToAddString(destination,new);
     char* newBase = new->startAddress;
     for (int i = 0; i < new->currentCharCount; ++i)
@@ -77,7 +79,7 @@ __unused void addString(String* destination, const String* new){
 
 }
 
-__unused void debugPrint(String* string){
+__unused PUBLIC void debugPrint(String* string){
     printf("String \"%s\":\n",string->startAddress);
     printf("Capacity: %d\n",string->capacity);
     printf("%5c",'i');
@@ -95,24 +97,24 @@ __unused void debugPrint(String* string){
     printf("\n");
 }
 
-__unused void makeEmpty(String* string){
+__unused PUBLIC void makeEmpty(String* string){
     string->currentCharCount=0;
     string->startAddress[0]='\0';
 }
-void addStrCharArray(String* string, const char* arr){
+PUBLIC void addStrCharArray(String* string, const char* arr){
     int capacity = (int)strlen(arr);
     for (int i = 0; i < capacity; ++i)
         addChar(string,arr[i]);
 }
 
-__unused void trim(String* string){
+__unused PUBLIC void trim(String* string){
     int trimmedCapacity=string->currentCharCount+1;
     char* newBase = realloc(string->startAddress,trimmedCapacity);
     ensureNotNull(newBase);
     string->startAddress=newBase;
     string->capacity=trimmedCapacity;
 }
-String* readTextFile(const char* filename){
+PUBLIC String* readTextFile(const char* filename){
     String* fileContents = newString();
 
     FILE* textFile = fopen(filename,"r");
@@ -126,7 +128,7 @@ String* readTextFile(const char* filename){
     free(newLine);
     return fileContents;
 }
-void saveStringAsTextFile(String* string, char* fileName){
+PUBLIC void saveStringAsTextFile(String* string, char* fileName){
     FILE* file = fopen(fileName, "w");
     ensureFileOpenedForWriting(file,fileName);
     fputs(string->startAddress,file);
