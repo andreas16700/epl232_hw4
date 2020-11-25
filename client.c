@@ -15,6 +15,8 @@ static char* options[]={
         ,"-decodeText"
         ,"-stringToImage"
         ,"-imageToString"
+        ,"-encryptStegano"
+        ,"-decryptStegano"
 };
 
 int digittoint(char i);
@@ -108,6 +110,16 @@ void choseOption(char* option, char*arguments[], int argumentCount){
                 exitWithMessage("Please specify just the image name.");
             textFromImage(arguments[0]);
             break;
+        case 8:
+            if (argumentCount!=3)
+                exitWithMessage("Three arguments must be specified for this option: \n(1) the shell image \n(2) image to encrypt and hide \n(3) password to use for encryption");
+            encryptAndHideImage(arguments[0],arguments[1],arguments[2]);
+            break;
+        case 9:
+            if (argumentCount!=2)
+                exitWithMessage("Two arguments must be specified for this option: \n(1) image that contains an encrypted hidden image \n(2) password that was used for encryption");
+            decryptHiddenImage(arguments[0],arguments[1]);
+            break;
         default:
             exitWithMessage("Illegal option!");
     }
@@ -116,7 +128,9 @@ void choseOption(char* option, char*arguments[], int argumentCount){
     &&\
     !defined(ENCODEIMAGE_DEBUG)  \
     &&\
-    !defined(DEBUG_TEXTENCODINGDECODING)
+    !defined(DEBUG_TEXTENCODINGDECODING) \
+    &&\
+    !defined(DEBUG_ENCRYPT_IMAGE)
 int main(int argc, char *argv[]) {
     for (int i = 0; i < argc; ++i)
         if (*argv[i]=='-') {

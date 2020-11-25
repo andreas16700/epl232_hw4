@@ -9,7 +9,6 @@
 
 
 
-
 /**
  * Prints the meta info of the header file of a bitmap image
  * @param bmpImage
@@ -98,6 +97,8 @@ void saveTextAsImage(const char *textFileName, const char *sampleImageName);
   */
  void textFromImage(char *imageFileName);
 
+void encryptAndHideImage(const char* shellImageName, const char* hiddenImageName, const char* password);
+void decryptHiddenImage(const char* imageWithEncryptedDataName, const char* password);
 
 
 #endif //BMPLIB_BMPLIB_H
