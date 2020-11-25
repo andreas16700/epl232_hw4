@@ -2,6 +2,7 @@
 #define BMPLIB_BMPLIB_H
 #define PUBLIC
 #define PRIVATE static
+//#define DEBUG_ENCRYPT_IMAGE
 
 #include <stdio.h>
 #include <stdlib.h>
