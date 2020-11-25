@@ -18,10 +18,13 @@ PRIVATE int *createPermutationFunction(int N, int key);
 //modifies the bit at pos p to b in given byte
 PRIVATE byte modifyBit(byte n, int p, int b);
 
-
 PUBLIC void encodeTextInsideAnImage(char *sourceImage, char *textToHide, int key) {
     char *text = readText(textToHide);
     byte *data = readImage(sourceImage);
+    if((strlen(text)+1)*8 > getLongFrom4Bytes(&data[34])){
+        printf("Text too large to hide!\n");
+        exit(-1);
+    }
     //plus one for the null character
     int textLength = (int)strlen(text)+1;
     printf("Encoding text of length %d.\n",textLength);
