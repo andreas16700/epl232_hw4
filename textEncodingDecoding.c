@@ -1,10 +1,9 @@
 //
 // Created by Sohaib on 18/11/2020.
 //
-#define _XOPEN_SOURCE
+
 #include "bmplib.h"
 #include <string.h>
-#include <stdlib.h>
 #include "Shared.h"
 
 //reads the text file from the given file name and returns a string

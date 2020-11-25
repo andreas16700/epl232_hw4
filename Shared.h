@@ -1,12 +1,13 @@
 //
 // Created by Andreas Loizides on 19/11/2020.
 //
-
+#define _XOPEN_SOURCE
 #ifndef BMPLIB_SHARED_H
 #define BMPLIB_SHARED_H
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "MyString.h"
 
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
@@ -94,5 +95,6 @@ void exitWithMessage(const char *message);
 
 void ensureFileExists(FILE* file, const char* filename);
 void ensureFileOpenedForWriting(FILE* file, char* filename);
+byte mergeBytes(byte importantByte, byte lessImportantByte, int bitsToUse);
 
 #endif //BMPLIB_SHARED_H

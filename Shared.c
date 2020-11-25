@@ -251,3 +251,22 @@ PUBLIC void ensureFileOpenedForWriting(FILE* file, char* filename){
         exitWithMessage("");
     }
 }
+PUBLIC byte mergeBytes(byte importantByte, byte lessImportantByte, int bitsToUse) {
+    if (bitsToUse>7)
+        return lessImportantByte;
+    if (bitsToUse<1)
+        return importantByte;
+    byte mask = (byte) 0;
+    mask = ~mask;
+    //mask now is 8 consecutive ones
+    byte upperMask = mask >> (byte) bitsToUse;
+    upperMask <<= (byte) bitsToUse;
+
+    byte upperPart = upperMask & importantByte;
+    byte lowerPart = lessImportantByte>>((unsigned)8-bitsToUse);
+
+    byte result = (byte) 0;
+    result |= upperPart;
+    result |= lowerPart;
+    return result;
+}
