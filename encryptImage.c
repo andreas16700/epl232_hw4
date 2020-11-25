@@ -4,8 +4,8 @@
 #include "Shared.h"
 #include <stdlib.h>
 #include "bmplib.h"
-#include <time.h>
 #define BITS_TO_USE 4
+#define SHUFFLE_COUNT 3
 
 unsigned long calculateHash(const char *str){
     unsigned long hash = 5381;
@@ -53,33 +53,56 @@ byte flipNBits(byte ofByte, byte n){
     }
     return reverseByte(result);
 }
-byte shuffleNMostSignificantBits(byte b, int n, byte willDecrypt){
+
+
+
+typedef struct BYTE_MSB_MODIFICATION {
+    byte bit1Index, bit2Index, bitsToFlip;
+} ByteMSBModification;
+ByteMSBModification *createModificationsArray(byte n, int times) {
+    ByteMSBModification* modifications = calloc(times,sizeof(ByteMSBModification));
+    ensureNotNull(modifications);
+    for (int i = 0; i < times; ++i) {
+        modifications[i].bit1Index=(unsigned)lrand48() % (unsigned) n;
+        modifications[i].bit2Index=(unsigned)lrand48() % (unsigned) n;
+        modifications[i].bitsToFlip=(unsigned)lrand48() % (unsigned) (n+1);
+    }
+
+    return modifications;
+}
+byte applyModificationToNMSB(ByteMSBModification* modification, byte toByte, byte n, byte willDecrypt){
     byte willEncrypt = !willDecrypt;
-    if (n<2 || n>8)
-        return b;
     byte bitsToIgnore = 8-n;
-    byte withOnlyMSB = b>>bitsToIgnore;
-    byte bit1Index = (unsigned)lrand48() % (unsigned) n;
-    byte bit2Index = (unsigned)lrand48() % (unsigned) n;
-    byte bitsToFlip = (unsigned)lrand48() % (unsigned) (n+1);
-    while (bit2Index==bit1Index)
-        bit2Index = (unsigned)lrand48() % (unsigned) n;
+    byte withOnlyMSB = toByte>>bitsToIgnore;
     if (willDecrypt)
-        withOnlyMSB=flipNBits(withOnlyMSB,bitsToFlip);
-    byte bit1 = (byte)(withOnlyMSB & maskForBit(bit1Index)) >> bit1Index;
-    byte bit2 = (byte)(withOnlyMSB & maskForBit(bit2Index)) >> bit2Index;
-    byte shuffledMSB = setBit(withOnlyMSB,bit1Index,bit2);
-    shuffledMSB=setBit(shuffledMSB,bit2Index,bit1);
+        withOnlyMSB=flipNBits(withOnlyMSB,modification->bitsToFlip);
+    byte bit1 = (byte)(withOnlyMSB & maskForBit(modification->bit1Index)) >> modification->bit1Index;
+    byte bit2 = (byte)(withOnlyMSB & maskForBit(modification->bit2Index)) >> modification->bit2Index;
+    byte shuffledMSB = setBit(withOnlyMSB,modification->bit1Index,bit2);
+    shuffledMSB=setBit(shuffledMSB,modification->bit2Index,bit1);
     if (willEncrypt)
-        shuffledMSB=flipNBits(shuffledMSB,bitsToFlip);
+        shuffledMSB=flipNBits(shuffledMSB,modification->bitsToFlip);
     //make shuffled msb again
     shuffledMSB<<=bitsToIgnore;
     //reset the previous MSB to zero
-    byte result = b << (byte)n;
+    byte result = toByte << (byte)n;
     result>>=(byte)n;
     //combine them
     result|=shuffledMSB;
     return result;
+}
+byte reorderAndShuffleNMSBMultipleTimes(byte b, byte n, int times, byte willDecrypt){
+    ByteMSBModification* modifications = createModificationsArray(n, times);
+    int modificationsApplied=0;
+    ByteMSBModification* currentModification = willDecrypt ? &modifications[times-1] : &modifications[0];
+    byte currentByte=b;
+    while (modificationsApplied!=times){
+        currentByte = applyModificationToNMSB(currentModification,currentByte,n,willDecrypt);
+        modificationsApplied++;
+        currentModification = willDecrypt ? currentModification-1 : currentModification+1;
+    }
+    free(modifications);
+    return currentByte;
 }
 
 void extractAndDecryptImageData(FILE* srcImage, FILE* extractedImage, const char* password){
@@ -89,7 +112,7 @@ void extractAndDecryptImageData(FILE* srcImage, FILE* extractedImage, const char
     while (signedByte!=EOF){
         byte mergedEncryptedByte = (byte) signedByte;
         byte extractedByte = mergedEncryptedByte<<((unsigned )(8-BITS_TO_USE));
-        byte decrypted = shuffleNMostSignificantBits(extractedByte,BITS_TO_USE,1);
+        byte decrypted = reorderAndShuffleNMSBMultipleTimes(extractedByte,BITS_TO_USE,SHUFFLE_COUNT,1);
         fputc(decrypted,extractedImage);
 
         signedByte = fgetc(srcImage);
@@ -110,7 +133,7 @@ void encryptAndHideImage(const char* shellImageName, const char* hiddenImageName
     while (signedByteShell!=EOF){
         if (signedByteHidden==EOF)
             exitWithMessage("The two images but have the same dimensions!");
-        byte hiddenImageByteShuffled = shuffleNMostSignificantBits((byte)signedByteHidden,BITS_TO_USE,0);
+        byte hiddenImageByteShuffled = reorderAndShuffleNMSBMultipleTimes((byte)signedByteHidden,BITS_TO_USE,SHUFFLE_COUNT,0);
         byte mergedByte = mergeBytes((byte)signedByteShell,hiddenImageByteShuffled,BITS_TO_USE);
         fputc(mergedByte,encryptedImage);
         signedByteShell = fgetc(shellImage);
@@ -141,6 +164,7 @@ void decryptHiddenImage(const char* imageWithEncryptedDataName, const char* pass
 
 
 #ifdef DEBUG_ENCRYPT_IMAGE
+#include <time.h>
 void testsetBit(){
     srand48(time(NULL));
     byte random = (unsigned)lrand48() & (unsigned)255;
@@ -154,22 +178,9 @@ void testsetBit(){
         }
     }
 }
-void testShuffleBits(){
+void testFlipN(){
     srand48(time(NULL));
     byte random = (unsigned)lrand48() & (unsigned)255;
-    printf("Byte:%d\n",random);
-    printf(BYTE_TO_BINARY_PATTERN,BYTE_TO_BINARY(random));printf("\n");
-    for (int i = 0; i < 8; ++i) {
-        printf("i=%d\n",i);
-        printf("%10s\t"BYTE_TO_BINARY_PATTERN"\n","Original:",BYTE_TO_BINARY(random));
-        byte shuffled = shuffleNMostSignificantBits(random,i,1);
-        printf("%10s\t"BYTE_TO_BINARY_PATTERN"\n","Shuffled:",BYTE_TO_BINARY(shuffled));
-    }
-}
-void testFlipN(){
-//    srand48(time(NULL));
-//    byte random = (unsigned)lrand48() & (unsigned)255;
-    byte random = 4;
     printf("Byte:%d\n",random);
     printf(BYTE_TO_BINARY_PATTERN,BYTE_TO_BINARY(random));printf("\n");
     for (int i = 0; i < 8; ++i) {
@@ -180,6 +191,7 @@ void testFlipN(){
     }
 }
 int main(){
+    testsetBit();
     testFlipN();
 }
 #endif
