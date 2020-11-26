@@ -57,7 +57,7 @@ Suppose that we merge them using 4 bits, as with the imageStegano function:
 
 mergedByte:&nbsp;&nbsp;&nbsp;&nbsp;**b1<sub>7</sub>b1<sub>6</sub>b1<sub>5</sub>b1<sub>4</sub>**&nbsp;&nbsp;&nbsp;**b2<sub>3</sub>b2<sub>2</sub>b2<sub>1</sub>b2<sub>0</sub>**
 
-But what anyone could incover the hidden image simply by making the LSB significant again!
+But anyone could uncover the hidden image simply by making the LSB significant again!
 
 This function attempts to encrypt the bits of the hidden image.
 
@@ -90,7 +90,7 @@ To ensure the encryption strength, a default of 3 modifications will happen for 
 ### Decrypt Image from Image
 Given a password, it applies the same modifications in reverse order.
 ### Space complexity
-Because every modification is done independantly for every byte, the function reads each byte, processes it and saves it.
+Because every modification is done independently for every byte, the function reads each byte, processes it and saves it.
 
 The whole image is never stored which could be very useful for big images.
 
