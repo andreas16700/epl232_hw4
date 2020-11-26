@@ -42,9 +42,9 @@ encryptAndHideImage("shell.bmp", "hidden.bmp", "swiftrules");
 decryptHiddenImage("encrypted-shell.bmp", "swiftrules");
 ```
 
-##Bonus functions
+## Bonus functions
 
-###Encrypt Image within Image
+### Encrypt Image within Image
 Suppose two images **img1** and **img2**. 
 
 Suppose the first data bytes **byte1** and **byte2** of img1 and img2 respectively:
@@ -71,7 +71,7 @@ An example modification could be the following:
 2. Flip the 3 first bits
 
 So the bits **b2<sub>3</sub>b2<sub>2</sub>b2<sub>1</sub>b2<sub>0</sub>** become **b2<sub>3</sub>~b2<sub>1</sub>~b2<sub>2</sub>~b2<sub>0</sub>**
-####Example
+#### Example
 Is one modification for each byte enough to encrypt an image?
 
 Suppose we encrypt and hide the right image inside the left:
@@ -87,9 +87,9 @@ Depending on if the encryptions were made once, twice, or thrice, they would get
 As you can see, modifying each byte 3 times yields the most desirable result.
 
 To ensure the encryption strength, a default of 3 modifications will happen for each byte.
-###Decrypt Image from Image
+### Decrypt Image from Image
 Given a password, it applies the same modifications in reverse order.
-###Space complexity
+### Space complexity
 Because every modification is done independantly for every byte, the function reads each byte, processes it and saves it.
 
 The whole image is never stored which could be very useful for big images.
