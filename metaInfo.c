@@ -48,8 +48,8 @@ PUBLIC void getMetaInfo(char *bmpImage) {
     printf("\n***************************************************************************\n");
     free(data);
 }
-#define DEBUG_LIST
-#ifndef DEBUG_LIST
+
+#ifdef DEBUG_LIST
 int main(int argc, char *argv[]){
     if(argc < 1)
         return 0;

@@ -169,8 +169,8 @@ PRIVATE int *createPermutationFunction(int N, int key) {
     return perm;
 }
 
-#define DEBUG_TEXTENCODINGDECODING
-#ifndef DEBUG_TEXTENCODINGDECODING
+
+#ifdef DEBUG_TEXTENCODINGDECODING
 int main(int argc, char *argv[]){
 
 }
