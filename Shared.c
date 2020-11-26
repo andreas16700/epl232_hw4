@@ -151,6 +151,7 @@ PUBLIC Dimensions readDimensionsOfImage(FILE *image) {
         fgetc(image);
     byte *biWidth = malloc(4 * sizeof(byte));
     byte *biHeight = malloc(4 * sizeof(byte));
+    ensureNotNull(biHeight);ensureNotNull(biWidth);
     for (int i = 0; i < 4; ++i)
         biWidth[i] = fgetc(image);
     for (int i = 0; i < 4; ++i)
@@ -158,6 +159,7 @@ PUBLIC Dimensions readDimensionsOfImage(FILE *image) {
     Dimensions dimensions = {.biHeight=intFromNBytes(biHeight, 4), .biWidth=intFromNBytes(biWidth, 4)};
     free(biHeight);
     free(biWidth);
+    rewind(image);
     return dimensions;
 }
 
@@ -269,4 +271,11 @@ PUBLIC byte mergeBytes(byte importantByte, byte lessImportantByte, int bitsToUse
     result |= upperPart;
     result |= lowerPart;
     return result;
+}
+int imagesHaveSameDimensions(FILE* img1, FILE* img2){
+    Dimensions img1Dimensions = readDimensionsOfImage(img1);
+    Dimensions img2Dimensions = readDimensionsOfImage(img2);
+    return img1Dimensions.biWidth==img2Dimensions.biWidth
+            &&
+            img1Dimensions.biHeight==img2Dimensions.biHeight;
 }

@@ -59,16 +59,13 @@ byte flipNBits(byte ofByte, byte n){
 typedef struct BYTE_MSB_MODIFICATION {
     byte bit1Index, bit2Index, bitsToFlip;
 } ByteMSBModification;
-ByteMSBModification *createModificationsArray(byte n, int times) {
-    ByteMSBModification* modifications = calloc(times,sizeof(ByteMSBModification));
+void createModificationsArray(byte n, int times, ByteMSBModification* modifications) {
     ensureNotNull(modifications);
     for (int i = 0; i < times; ++i) {
         modifications[i].bit1Index=(unsigned)lrand48() % (unsigned) n;
         modifications[i].bit2Index=(unsigned)lrand48() % (unsigned) n;
         modifications[i].bitsToFlip=(unsigned)lrand48() % (unsigned) (n+1);
     }
-
-    return modifications;
 }
 byte applyModificationToNMSB(ByteMSBModification* modification, byte toByte, byte n, byte willDecrypt){
     byte willEncrypt = !willDecrypt;
@@ -91,8 +88,8 @@ byte applyModificationToNMSB(ByteMSBModification* modification, byte toByte, byt
     result|=shuffledMSB;
     return result;
 }
-byte reorderAndShuffleNMSBMultipleTimes(byte b, byte n, int times, byte willDecrypt){
-    ByteMSBModification* modifications = createModificationsArray(n, times);
+byte reorderAndShuffleNMSBMultipleTimes(byte b, byte n, int times, byte willDecrypt ,ByteMSBModification* modifications){
+    createModificationsArray(n, times, modifications);
     int modificationsApplied=0;
     ByteMSBModification* currentModification = willDecrypt ? &modifications[times-1] : &modifications[0];
     byte currentByte=b;
@@ -101,46 +98,73 @@ byte reorderAndShuffleNMSBMultipleTimes(byte b, byte n, int times, byte willDecr
         modificationsApplied++;
         currentModification = willDecrypt ? currentModification-1 : currentModification+1;
     }
-    free(modifications);
     return currentByte;
 }
 
 void extractAndDecryptImageData(FILE* srcImage, FILE* extractedImage, const char* password){
+    //seed randomizer with the password
     long hash = (signed)calculateHash(password);
     srand48(hash);
+    //Because the modifications array will have the same length for every reorder/shuffle
+    //we need only declare once memory for it
+    //and free it after the last reorder/shuffle
+    ByteMSBModification* modifications = calloc(SHUFFLE_COUNT,sizeof(ByteMSBModification));
+    ensureNotNull(modifications);
+    //must save the byte into a signed type because EOF might be negative
     int signedByte = fgetc(srcImage);
     while (signedByte!=EOF){
         byte mergedEncryptedByte = (byte) signedByte;
+        //make the LSB significant to reveal the hidden image
         byte extractedByte = mergedEncryptedByte<<((unsigned )(8-BITS_TO_USE));
-        byte decrypted = reorderAndShuffleNMSBMultipleTimes(extractedByte,BITS_TO_USE,SHUFFLE_COUNT,1);
+        //needs decryptions
+        byte decrypted = reorderAndShuffleNMSBMultipleTimes(extractedByte,BITS_TO_USE,SHUFFLE_COUNT,1,modifications);
         fputc(decrypted,extractedImage);
 
         signedByte = fgetc(srcImage);
     }
+    free(modifications);
 }
-void encryptAndHideImage(const char* shellImageName, const char* hiddenImageName, const char* password){
-    FILE* shellImage = fopen(shellImageName,"rb");
-    FILE* hiddenImage = fopen(hiddenImageName,"rb");
-    ensureIsValidBMP(shellImage);ensureIsValidBMP(hiddenImage);
+
+void encryptAndWriteImageData(const char *password, FILE *shellImage, FILE *hiddenImage,
+                              FILE *encryptedImage) {
     long hash = (signed)calculateHash(password);
     srand48(hash);
-    char* encryptedImageName = addPrefix(shellImageName,"encrypted-");
-    FILE* encryptedImage = fopen(encryptedImageName,"wb");
-    ensureFileOpenedForWriting(encryptedImage,encryptedImageName);
-    copyHeader(shellImage,encryptedImage);copyHeader(hiddenImage,encryptedImage);
+    //Because the modifications array will have the same length for every reorder/shuffle
+    //we need only declare once memory for it
+    //and free it after the last reorder/shuffle
+    ByteMSBModification* modifications = calloc(SHUFFLE_COUNT,sizeof(ByteMSBModification));
+    ensureNotNull(modifications);
     int signedByteShell = fgetc(shellImage);
     int signedByteHidden = fgetc(hiddenImage);
     while (signedByteShell!=EOF){
         if (signedByteHidden==EOF)
             exitWithMessage("The two images but have the same dimensions!");
-        byte hiddenImageByteShuffled = reorderAndShuffleNMSBMultipleTimes((byte)signedByteHidden,BITS_TO_USE,SHUFFLE_COUNT,0);
+        byte hiddenImageByteShuffled = reorderAndShuffleNMSBMultipleTimes((byte)signedByteHidden,BITS_TO_USE,SHUFFLE_COUNT,0,modifications);
         byte mergedByte = mergeBytes((byte)signedByteShell,hiddenImageByteShuffled,BITS_TO_USE);
         fputc(mergedByte,encryptedImage);
         signedByteShell = fgetc(shellImage);
         signedByteHidden = fgetc(hiddenImage);
     }
+    free(modifications);
     if (signedByteHidden!=EOF)
         exitWithMessage("The two images but have the same dimensions!");
+}
+
+void encryptAndHideImage(const char* shellImageName, const char* hiddenImageName, const char* password){
+    //Input (open files)
+    FILE* shellImage = fopen(shellImageName,"rb");
+    FILE* hiddenImage = fopen(hiddenImageName,"rb");
+    ensureIsValidBMP(shellImage);ensureIsValidBMP(hiddenImage);
+    if (!imagesHaveSameDimensions(shellImage,hiddenImage)){
+        fclose(shellImage);fclose(hiddenImage);
+        exitWithMessage("The two images must have the same dimensions");
+    }
+    char* encryptedImageName = addPrefix(shellImageName,"encrypted-");
+    FILE* encryptedImage = fopen(encryptedImageName,"wb");
+    ensureFileOpenedForWriting(encryptedImage,encryptedImageName);
+    //Processing and Output (merge, encrypt and write bytes)
+    copyHeader(shellImage,encryptedImage);copyHeader(hiddenImage,encryptedImage);
+    encryptAndWriteImageData(password, shellImage, hiddenImage, encryptedImage);
     fclose(encryptedImage);
     fclose(shellImage);
     fclose(hiddenImage);
@@ -153,10 +177,9 @@ void decryptHiddenImage(const char* imageWithEncryptedDataName, const char* pass
     ensureIsValidBMP(imageWithEncryptedData);
     char* newImageName = addPrefix(imageWithEncryptedDataName,"decrypted-");
     FILE* decryptedImage = fopen(newImageName,"wb");
-    //Processing
+    //Processing & Output
     copyHeader(imageWithEncryptedData,decryptedImage);
     extractAndDecryptImageData(imageWithEncryptedData,decryptedImage,password);
-    //Output
     free(newImageName);
     fclose(imageWithEncryptedData);
     fclose(decryptedImage);

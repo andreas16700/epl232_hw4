@@ -96,5 +96,6 @@ void exitWithMessage(const char *message);
 void ensureFileExists(FILE* file, const char* filename);
 void ensureFileOpenedForWriting(FILE* file, char* filename);
 byte mergeBytes(byte importantByte, byte lessImportantByte, int bitsToUse);
+int imagesHaveSameDimensions(FILE* img1, FILE* img2);
 
 #endif //BMPLIB_SHARED_H

@@ -59,6 +59,10 @@ PUBLIC void encodeImageWithinImage(const char *shellImageName,const char *hidden
     FILE* hiddenImage = fopen(hiddenImageName,"rb");
     ensureIsValidBMP(shellImage);
     ensureIsValidBMP(hiddenImage);
+    if (!imagesHaveSameDimensions(shellImage,hiddenImage)){
+        fclose(shellImage);fclose(hiddenImage);
+        exitWithMessage("The two images must have the same dimensions!");
+    }
     char* newName = addPrefix(shellImageName,"new-");
     FILE* output = fopen(newName, "wb");
     ensureFileOpenedForWriting(output,newName);
