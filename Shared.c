@@ -211,6 +211,7 @@ PUBLIC byte *readOnlyImageData(FILE *image) {
 
 PUBLIC byte *readImage(char *imageFile) {
     FILE *fp = fopen(imageFile, "rb");
+    ensureIsValidBMP(fp);
     ensureFileExists(fp, imageFile);
     byte b;
     int readByte;

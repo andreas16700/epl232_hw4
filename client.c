@@ -144,7 +144,11 @@ void choseOption(char* option, char*arguments[], int argumentCount){
     &&\
     !defined(DEBUG_TEXTENCODINGDECODING) \
     &&\
-    !defined(DEBUG_ENCRYPT_IMAGE)
+    !defined(DEBUG_ENCRYPT_IMAGE) \
+    &&\
+    !defined(DEBUG_LIST) \
+    &&\
+    !defined(DEBUG_GRAYSCALE)
 int main(int argc, char *argv[]) {
     for (int i = 0; i < argc; ++i)
         if (*argv[i]=='-') {

@@ -172,8 +172,6 @@ PRIVATE int *createPermutationFunction(int N, int key) {
 #define DEBUG_TEXTENCODINGDECODING
 #ifndef DEBUG_TEXTENCODINGDECODING
 int main(int argc, char *argv[]){
-    char str = {'a', 'b', '/0'};
-    printf("here %d\n", getBit(&str, 0));
 
 }
 #endif

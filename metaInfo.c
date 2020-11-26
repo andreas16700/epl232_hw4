@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 //
-// Created by sohae on 19/11/2020.
+// Created by Sohaib on 19/11/2020.
 //
 #include "bmplib.h"
 #include "Shared.h"
@@ -48,3 +48,12 @@ PUBLIC void getMetaInfo(char *bmpImage) {
     printf("\n***************************************************************************\n");
     free(data);
 }
+#define DEBUG_LIST
+#ifndef DEBUG_LIST
+int main(int argc, char *argv[]){
+    if(argc < 1)
+        return 0;
+    getMetaInfo(argv[1]);
+    return 0;
+}
+#endif

@@ -47,8 +47,9 @@ PRIVATE int getGray(byte red, byte green, byte blue) {
 #define DEBUG_GRAYSCALE
 #ifndef DEBUG_GRAYSCALE
 int main(int argc, char *argv[]){
-    if(isValidBMP(argv[1]))
-        applyGrayscale(argv[1]);
+    if(argc < 1)
+        return 0;
+    applyGrayscale(argv[1]);
     return 0;
 }
 #endif
