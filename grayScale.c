@@ -33,7 +33,7 @@ PUBLIC void applyGrayscale(char *imageFileName) {
         data[i + 1] = grayValue;
         data[i + 2] = grayValue;
     }
-    char* newName = addPrefix(imageFileName, "gray-");
+    char* newName = addPrefix(imageFileName, "new-");
     createNewImageFile(newName, data);
     printf("Saved new image as \"%s\".\n",newName);
     free(data);
