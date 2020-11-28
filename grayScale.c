@@ -44,3 +44,12 @@ PRIVATE int getGray(byte red, byte green, byte blue) {
     return (int)round(0.299 * red + 0.587 * green + 0.114 * blue);
 }
 
+
+#ifdef DEBUG_GRAYSCALE
+int main(int argc, char *argv[]){
+    if(argc < 1)
+        return 0;
+    applyGrayscale(argv[1]);
+    return 0;
+}
+#endif
