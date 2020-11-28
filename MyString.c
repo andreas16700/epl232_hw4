@@ -37,6 +37,7 @@ PUBLIC String* newStringWithCapacity(int capacity){
     ensureNotNull(charArrayBase);
     new->capacity=capacity;
     new->startAddress=charArrayBase;
+    //terminate the string.
     new->startAddress[new->currentCharCount]='\0';
     return new;
 }
