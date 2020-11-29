@@ -1,3 +1,4 @@
+\mainpage
 # BMP Image Steganography
 
 Library for hiding information into BMP images. This is the fourth assignment of EPL232.
@@ -45,6 +46,12 @@ decryptHiddenImage("encrypted-shell.bmp", "swiftrules");
 ## Bonus functions
 
 ### Encrypt Image within Image
+####Usage
+```bash
+./bmpSteganography -encryptStegano SHELL_IMAGE.bmp TO_HIDE.bmp PASSWORD
+```
+New image is saved as *encrypted-* SHELL_IMAGE.bmp
+
 Suppose two images **img1** and **img2**. 
 
 Suppose the first data bytes **byte1** and **byte2** of img1 and img2 respectively:
@@ -88,6 +95,11 @@ As you can see, modifying each byte 3 times yields the most desirable result.
 
 To ensure the encryption strength, a default of 3 modifications will happen for each byte.
 ### Decrypt Image from Image
+####Usage
+```bash
+./bmpSteganography -decryptStegano encrypted-SHELL_IMAGE.bmp PASSWORD
+```
+Extracted/decrypted image is saved as *decrypted-* encrypted-SHELL_IMAGE.bmp
 Given a password, it applies the same modifications in reverse order.
 ### Space complexity
 Because every modification is done independently for every byte, the function reads each byte, processes it and saves it.
