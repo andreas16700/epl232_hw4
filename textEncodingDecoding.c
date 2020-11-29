@@ -19,9 +19,10 @@
 // Created by Sohaib on 18/11/2020.
 //
 
+#include "Shared.h"
 #include "bmplib.h"
 #include <string.h>
-#include "Shared.h"
+
 
 //reads the text file from the given file name and returns a string
 PRIVATE char *readText(char *textToHide);
