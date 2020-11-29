@@ -172,6 +172,9 @@ PRIVATE int *createPermutationFunction(int N, int key) {
 
 #ifdef DEBUG_TEXTENCODINGDECODING
 int main(int argc, char *argv[]){
-
+    if(argc < 3)
+        return -1;
+    encodeTextInsideAnImage(argv[1],argv[2],3);
+    decodeTextFromImage(addPrefix(argv[1], "new-"),addPrefix(argv[2], "new-"),3);
 }
 #endif
