@@ -19,12 +19,9 @@
 // Created by Andreas Loizides on 18/11/2020.
 //
 
+#include "Shared.h"
 #include <stdlib.h>
 #include "bmplib.h"
-#include "Shared.h"
-//this file implements the following functions
-//newImage encodeImageWithinImage(FILE* shellImage, FILE* hiddenImage, int bitsToUse);
-//newImage decodeHiddenImageFromEncodedImage(FILE* encryptedImage, int bitsToUse);
 
 
 

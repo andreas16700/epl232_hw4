@@ -28,12 +28,13 @@ PUBLIC void applyGrayscale(char *imageFileName) {
     unsigned int sizeOfFile = getLongFrom4Bytes(&data[2]);
     unsigned int sizeOfHeaders = sizeOfFile - getLongFrom4Bytes(&data[34]);
     for (unsigned int i = sizeOfHeaders; i + 2 < sizeOfFile; i += 3) {
+        //every three bytes (1 pixel) are assigned an equivalent gray value
         int grayValue = getGray(data[i], data[i + 1], data[i + 2]);
         data[i] = grayValue;
         data[i + 1] = grayValue;
         data[i + 2] = grayValue;
     }
-    char* newName = addPrefix(imageFileName, "gray-");
+    char* newName = addPrefix(imageFileName, "new-");
     createNewImageFile(newName, data);
     printf("Saved new image as \"%s\".\n",newName);
     free(data);

@@ -266,9 +266,9 @@ void debugTextFromImage(char *imageFileName) {
 }
 void testGetBit(){
     printf("t:\t");
-    printf(BYTE_TO_BINARY_PATTERN,BYTE_TO_BINARY('t'));
+    printf(BYTE_TO_BINARY_PATTERN,BYTE_TO_BINARY((unsigned)'t'));
     printf("\ne:\t");
-    printf(BYTE_TO_BINARY_PATTERN,BYTE_TO_BINARY('e'));
+    printf(BYTE_TO_BINARY_PATTERN,BYTE_TO_BINARY((unsigned)'e'));
     printf("\n");
     String* str = newStringFromCharArray("test");
     int height = 3, width=5;
@@ -282,11 +282,11 @@ void testGetBit(){
         }
     }
 }
-int main(){
-//    String* textFile = readTextFile("strFile.txt");
-//    saveTextAsImage(textFile,"tux-pirate.bmp","outputImage.bmp");
-//    destroyString(textFile);
-//    textFromImage("outputImage.bmp","recoveredtp.txt");
-debugTextFromImage("pyrros.bmp");
+int main(int argc, char *argv[]){
+        if (argc<2) {
+            printf("Run with an image filename/path.\ne.g. \n./program image.bmp\n");
+        }
+    printf("Reading text from image \"%s\"\n",argv[1]);
+    debugTextFromImage(argv[1]);
 }
 #endif

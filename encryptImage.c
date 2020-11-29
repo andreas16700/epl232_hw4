@@ -24,7 +24,7 @@
 #define BITS_TO_USE 4
 #define SHUFFLE_COUNT 3
 
-unsigned long calculateHash(const char *str){
+PRIVATE unsigned long calculateHash(const char *str){
     unsigned long hash = 5381;
     int c;
 
@@ -34,10 +34,10 @@ unsigned long calculateHash(const char *str){
     return hash;
 }
 
-byte maskForBit(byte bitIndex){
+PRIVATE byte maskForBit(byte bitIndex){
     return (unsigned)1<<bitIndex;
 }
-byte setBit(byte ofByte, byte bitIndex, byte bitValue){
+PRIVATE byte setBit(byte ofByte, byte bitIndex, byte bitValue){
     byte result = ofByte;
     //set the bit  at that index to 0
     byte indexMask = maskForBit(bitIndex);
@@ -47,7 +47,7 @@ byte setBit(byte ofByte, byte bitIndex, byte bitValue){
     result|=bitAtCorrectIndex;
     return result;
 }
-byte reverseByte(byte ofByte){
+PRIVATE byte reverseByte(byte ofByte){
     byte result=0;
     for (int i = 0; i < 8; ++i) {
         result<<=(byte)0x1;
@@ -56,7 +56,7 @@ byte reverseByte(byte ofByte){
     }
     return result;
 }
-byte flipNBits(byte ofByte, byte n){
+PRIVATE byte flipNBits(byte ofByte, byte n){
     byte result=0;
     for (byte i = 0; i <8 ; ++i) {
         byte bit = ofByte&(byte)0x1;
@@ -74,7 +74,7 @@ byte flipNBits(byte ofByte, byte n){
 typedef struct BYTE_MSB_MODIFICATION {
     byte bit1Index, bit2Index, bitsToFlip;
 } ByteMSBModification;
-void createModificationsArray(byte n, int times, ByteMSBModification* modifications) {
+PRIVATE void createModificationsArray(byte n, int times, ByteMSBModification* modifications) {
     ensureNotNull(modifications);
     for (int i = 0; i < times; ++i) {
         modifications[i].bit1Index=(unsigned)lrand48() % (unsigned) n;
@@ -82,7 +82,7 @@ void createModificationsArray(byte n, int times, ByteMSBModification* modificati
         modifications[i].bitsToFlip=(unsigned)lrand48() % (unsigned) (n+1);
     }
 }
-byte applyModificationToNMSB(ByteMSBModification* modification, byte toByte, byte n, byte willDecrypt){
+PRIVATE byte applyModificationToNMSB(ByteMSBModification* modification, byte toByte, byte n, byte willDecrypt){
     byte willEncrypt = !willDecrypt;
     byte bitsToIgnore = 8-n;
     byte withOnlyMSB = toByte>>bitsToIgnore;
@@ -103,7 +103,7 @@ byte applyModificationToNMSB(ByteMSBModification* modification, byte toByte, byt
     result|=shuffledMSB;
     return result;
 }
-byte reorderAndShuffleNMSBMultipleTimes(byte b, byte n, int times, byte willDecrypt ,ByteMSBModification* modifications){
+PRIVATE byte reorderAndShuffleNMSBMultipleTimes(byte b, byte n, int times, byte willDecrypt ,ByteMSBModification* modifications){
     createModificationsArray(n, times, modifications);
     int modificationsApplied=0;
     ByteMSBModification* currentModification = willDecrypt ? &modifications[times-1] : &modifications[0];
@@ -116,7 +116,7 @@ byte reorderAndShuffleNMSBMultipleTimes(byte b, byte n, int times, byte willDecr
     return currentByte;
 }
 
-void extractAndDecryptImageData(FILE* srcImage, FILE* extractedImage, const char* password){
+PRIVATE void extractAndDecryptImageData(FILE* srcImage, FILE* extractedImage, const char* password){
     //seed randomizer with the password
     long hash = (signed)calculateHash(password);
     srand48(hash);
@@ -140,7 +140,7 @@ void extractAndDecryptImageData(FILE* srcImage, FILE* extractedImage, const char
     free(modifications);
 }
 
-void encryptAndWriteImageData(const char *password, FILE *shellImage, FILE *hiddenImage,
+PRIVATE void encryptAndWriteImageData(const char *password, FILE *shellImage, FILE *hiddenImage,
                               FILE *encryptedImage) {
     long hash = (signed)calculateHash(password);
     srand48(hash);
@@ -165,7 +165,7 @@ void encryptAndWriteImageData(const char *password, FILE *shellImage, FILE *hidd
         exitWithMessage("The two images but have the same dimensions!");
 }
 
-void encryptAndHideImage(const char* shellImageName, const char* hiddenImageName, const char* password){
+PUBLIC void encryptAndHideImage(const char* shellImageName, const char* hiddenImageName, const char* password){
     //Input (open files)
     FILE* shellImage = fopen(shellImageName,"rb");
     FILE* hiddenImage = fopen(hiddenImageName,"rb");
@@ -186,7 +186,7 @@ void encryptAndHideImage(const char* shellImageName, const char* hiddenImageName
     printf("Saved image with hidden encrypted image as \"%s\".\nDon't forget your password!\n",encryptedImageName);
     free(encryptedImageName);
 }
-void decryptHiddenImage(const char* imageWithEncryptedDataName, const char* password){
+PUBLIC void decryptHiddenImage(const char* imageWithEncryptedDataName, const char* password){
     //Input (open files)
     FILE* imageWithEncryptedData = fopen(imageWithEncryptedDataName,"rb");
     ensureIsValidBMP(imageWithEncryptedData);
@@ -204,6 +204,7 @@ void decryptHiddenImage(const char* imageWithEncryptedDataName, const char* pass
 #ifdef DEBUG_ENCRYPT_IMAGE
 #include <time.h>
 void testsetBit(){
+    printf("setBit(): set a bit at a specified index to a specified value.\n");
     srand48(time(NULL));
     byte random = (unsigned)lrand48() & (unsigned)255;
     printf("Byte:%d\n",random);
@@ -217,6 +218,7 @@ void testsetBit(){
     }
 }
 void testFlipN(){
+    printf("flipN(): flip the first N bits in a byte.\n");
     srand48(time(NULL));
     byte random = (unsigned)lrand48() & (unsigned)255;
     printf("Byte:%d\n",random);
@@ -228,8 +230,40 @@ void testFlipN(){
         printf("%10s\t"BYTE_TO_BINARY_PATTERN"\n","Flipped:",BYTE_TO_BINARY(flipped));
     }
 }
-int main(){
+void test(){
     testsetBit();
     testFlipN();
+}
+void printUsage(){
+    printf("Correct usage:\n-e imgShell.bmp imgToHide.bmp passwordhere\n-d shelWithEncrypted passwordhere\n");
+}
+int main(int argc, char *argv[]) {
+    printf("Hello. Choose an option:\n[1] test methods\n[2] encrypt and hide image inside another image");
+    int i;
+    do {
+        i = getchar();
+    }while (i=='1' || i=='2');
+    if (i=='1') {
+        test();
+        return 0;
+    }
+    if (argc<2) {
+        printUsage();
+        return -1;
+    }
+    for (i = 0; i < argc; ++i) {
+        if (*argv[i]=='-') {
+            if (argv[i][1] == 'e' && (argc - 1 - i) == 3) {
+                encryptAndHideImage(argv[i + 1], argv[i + 2], argv[i + 3]);
+                return 0;
+            } else {
+                if (argv[i][1] == 'd' && (argc - 1 - i) == 2)
+                    decryptHiddenImage(argv[i + 1], argv[i + 2]);
+                return 0;
+            }
+        }
+    }
+    printUsage();
+    return 0;
 }
 #endif
